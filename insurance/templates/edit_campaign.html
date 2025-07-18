@@ -1,0 +1,252 @@
+{% load static %}
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <title>Edit Campaign</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link rel="stylesheet" href="https://unpkg.com/leaflet/dist/leaflet.css" />
+    <style>
+        /* Global Layout */
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            display: flex;
+            min-height: 100vh;
+            background-color: #f4f7fa;
+        }
+
+        /* Sidebar */
+        .sidebar {
+            width: 220px;
+            background-color: #2a3f54;
+            color: #fff;
+            position: fixed;
+            height: 100vh;
+            padding: 20px;
+        }
+
+        .sidebar h2 {
+            margin-bottom: 30px;
+            font-size: 22px;
+            text-align: center;
+            color: #f9c74f;
+        }
+
+        .sidebar a {
+            display: block;
+            text-decoration: none;
+            color: #fff;
+            padding: 10px;
+            border-radius: 4px;
+            margin-bottom: 10px;
+            transition: background 0.3s;
+        }
+
+        .sidebar a:hover {
+            background-color: #1a2732;
+        }
+
+        /* Main Content */
+        .main-content {
+            margin-left: 220px;
+            padding: 30px;
+            flex: 1;
+        }
+
+        h2 {
+            font-size: 26px;
+            text-align: center;
+            margin-bottom: 30px;
+            color: #003366;
+        }
+
+        form {
+            background-color: #fff;
+            padding: 30px;
+            border-radius: 8px;
+            max-width: 700px;
+            margin: 0 auto;
+            box-shadow: 0 0 8px rgba(0, 0, 0, 0.05);
+        }
+
+        label {
+            display: block;
+            margin-top: 15px;
+            font-weight: bold;
+            color: #003366;
+        }
+
+        input,
+        select,
+        button {
+            width: 100%;
+            padding: 10px;
+            margin-top: 5px;
+            border-radius: 4px;
+            border: 1px solid #ccc;
+        }
+
+        button {
+            background-color: #003366;
+            color: white;
+            font-weight: bold;
+            border: none;
+            cursor: pointer;
+            margin-top: 20px;
+        }
+
+        button:hover {
+            background-color: #0059b3;
+        }
+
+        #map {
+            height: 300px;
+            margin-top: 15px;
+            border-radius: 4px;
+        }
+
+        .msg {
+            padding: 10px;
+            margin-bottom: 15px;
+            border-radius: 4px;
+        }
+
+        .error {
+            background-color: #fdd;
+            border: 1px solid #f99;
+        }
+
+        .success {
+            background-color: #dfd;
+            border: 1px solid #9f9;
+        }
+
+        /* Footer */
+        footer {
+            background-color: #2a3f54;
+            color: #fff;
+            text-align: center;
+            padding: 12px;
+            position: fixed;
+            bottom: 0;
+            width: 100%;
+            left: 0;
+        }
+
+        @media (max-width: 768px) {
+            .sidebar {
+                width: 100%;
+                height: auto;
+                position: relative;
+            }
+
+            .main-content {
+                margin-left: 0;
+                padding: 20px;
+            }
+
+            form {
+                padding: 20px;
+            }
+
+            footer {
+                position: relative;
+            }
+        }
+    </style>
+</head>
+
+<body>
+    <!-- Sidebar -->
+    <div class="sidebar">
+        <h2>Admin Panel</h2>
+        <a href="{% url 'admin_dashboard' %}">Dashboard</a>
+        <a href="{% url 'add_agents' %}">Add Agents</a>
+        <a href="{% url 'manage_campaigns' %}">Add Campaigns</a>
+        <a href="{% url 'all_agents' %}">All Agents</a>
+        <a href="{% url 'all_campaigns' %}">View Campaigns</a>
+        <a href="{% url 'logout' %}">Logout</a>
+    </div>
+
+    <!-- Main Content -->
+    <div class="main-content">
+        <h2>Edit Campaign</h2>
+
+        {% for message in messages %}
+        <div class="msg {{ message.tags }}">{{ message }}</div>
+        {% endfor %}
+
+        <form method="POST">
+            {% csrf_token %}
+            <label>Campaign Name:</label>
+            <input type="text" name="name" value="{{ campaign.name }}" required>
+
+            <label>Date:</label>
+            <input type="date" name="date" value="{{ campaign.date|date:'Y-m-d' }}" required>
+
+            <label>Location:</label>
+            <input type="text" name="location" id="location" value="{{ campaign.location }}" required>
+
+            <input type="hidden" name="latitude" id="latitude" value="{{ campaign.latitude }}">
+            <input type="hidden" name="longitude" id="longitude" value="{{ campaign.longitude }}">
+
+            <div id="map"></div>
+
+            <label>Assign Agent:</label>
+            <select name="agent" required>
+                {% for agent in agents %}
+                <option value="{{ agent.id }}" {% if agent.id == campaign.agent.id %}selected{% endif %}>
+                    {{ agent.user.get_full_name }}
+                </option>
+                {% endfor %}
+            </select>
+
+            <button type="submit">Update Campaign</button>
+        </form>
+    </div>
+
+    <!-- Footer -->
+    <footer>
+        &copy; 2025 Insurance CRM. All rights reserved.
+    </footer>
+
+    <!-- Leaflet Map Script -->
+    <script src="https://unpkg.com/leaflet/dist/leaflet.js"></script>
+    <script>
+        let map = L.map('map').setView([{{ campaign.latitude }}, {{ campaign.longitude }}], 13);
+        L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
+            maxZoom: 19,
+        }).addTo(map);
+
+        let marker = L.marker([{{ campaign.latitude }}, {{ campaign.longitude }}]).addTo(map);
+
+        document.getElementById("location").addEventListener("input", function () {
+            let query = this.value;
+            if (query.length > 3) {
+                fetch(`https://nominatim.openstreetmap.org/search?format=json&q=${query}`)
+                    .then(res => res.json())
+                    .then(data => {
+                        if (data.length > 0) {
+                            let lat = data[0].lat;
+                            let lon = data[0].lon;
+                            document.getElementById("latitude").value = lat;
+                            document.getElementById("longitude").value = lon;
+
+                            if (marker) map.removeLayer(marker);
+                            marker = L.marker([lat, lon]).addTo(map);
+                            map.setView([lat, lon], 13);
+                        }
+                    });
+            }
+        });
+    </script>
+</body>
+
+</html>

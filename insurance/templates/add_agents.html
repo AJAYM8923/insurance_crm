@@ -1,0 +1,355 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <title>Add Agent</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <style>
+        /* Global Styles */
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            display: flex;
+            min-height: 100vh;
+            background-color: #f4f7fa;
+        }
+
+        /* Sidebar */
+        .sidebar {
+            width: 220px;
+            background-color: #2a3f54;
+            color: #fff;
+            position: fixed;
+            height: 100vh;
+            padding: 20px;
+        }
+
+        .sidebar h2 {
+            margin-bottom: 30px;
+            font-size: 22px;
+            text-align: center;
+            color: #f9c74f;
+        }
+
+        .sidebar ul {
+            list-style: none;
+        }
+
+        .sidebar ul li {
+            margin: 15px 0;
+        }
+
+        .sidebar ul li a {
+            text-decoration: none;
+            color: #fff;
+            padding: 10px;
+            display: block;
+            border-radius: 4px;
+            transition: background 0.3s;
+        }
+
+        .sidebar ul li a:hover {
+            background-color: #1a2732;
+        }
+
+        /* Main Content */
+        .main-content {
+            margin-left: 220px;
+            padding: 30px;
+            flex: 1;
+        }
+
+        h2 {
+            text-align: center;
+            color: #003366;
+            margin-bottom: 20px;
+        }
+
+        form {
+            background: #fff;
+            padding: 30px;
+            border-radius: 8px;
+            max-width: 700px;
+            margin: auto;
+            box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+        }
+
+        .form-group {
+            margin-bottom: 15px;
+        }
+
+        label {
+            display: block;
+            margin-bottom: 5px;
+            font-weight: bold;
+        }
+
+        input,
+        select {
+            width: 100%;
+            padding: 10px;
+            border: 1px solid #aaa;
+            border-radius: 5px;
+        }
+
+        button {
+            padding: 12px;
+            width: 100%;
+            background-color: #003366;
+            color: white;
+            border: none;
+            border-radius: 5px;
+            font-size: 16px;
+            cursor: pointer;
+        }
+
+        button:hover {
+            background-color: #002244;
+        }
+
+        .error {
+            color: red;
+            font-size: 0.9em;
+            display: none;
+        }
+
+        .success-msg,
+        .error-msg {
+            text-align: center;
+            font-weight: bold;
+            margin-bottom: 10px;
+        }
+
+        .success-msg {
+            color: green;
+        }
+
+        .error-msg {
+            color: red;
+        }
+
+        /* Footer */
+        footer {
+            background-color: #2a3f54;
+            color: #fff;
+            text-align: center;
+            padding: 12px;
+            position: fixed;
+            bottom: 0;
+            width: 100%;
+            left: 0;
+        }
+
+        @media (max-width: 768px) {
+            .sidebar {
+                width: 100%;
+                height: auto;
+                position: relative;
+            }
+
+            .main-content {
+                margin-left: 0;
+                padding: 20px;
+            }
+
+            footer {
+                position: relative;
+            }
+        }
+    </style>
+</head>
+
+<body>
+
+    <div class="sidebar">
+        <h2>Admin Panel</h2>
+        <ul>
+            <li><a href="{% url 'admin_dashboard' %}">Dashboard</a></li>
+            <li><a href="{% url 'add_agents' %}">Add Agents</a></li>
+            <li><a href="{% url 'manage_campaigns' %}">Add Campaigns</a></li>
+            <li><a href="{% url 'all_agents' %}">All Agents</a></li>
+            <li><a href="{% url 'all_campaigns' %}">View Campaigns</a></li>
+            <li><a href="{% url 'logout' %}">Logout</a></li>
+        </ul>
+    </div>
+
+    <div class="main-content">
+        <form method="POST" enctype="multipart/form-data" onsubmit="return validateForm()">
+            {% csrf_token %}
+            <h2>Add New Agent</h2>
+
+            {% if messages %}
+            {% for message in messages %}
+            <div class="{% if message.tags %}{{ message.tags }}-msg{% endif %}">{{ message }}</div>
+            {% endfor %}
+            {% endif %}
+
+            <div class="form-group">
+                <label>First Name *</label>
+                <input type="text" name="first_name" id="first_name" required>
+                <div class="error" id="first_name_error">First name is required</div>
+            </div>
+
+            <div class="form-group">
+                <label>Last Name *</label>
+                <input type="text" name="last_name" id="last_name" required>
+                <div class="error" id="last_name_error">Last name is required</div>
+            </div>
+
+            <div class="form-group">
+                <label>Email *</label>
+                <input type="email" name="email" id="email" required>
+                <div class="error" id="email_error">Valid email is required</div>
+            </div>
+
+            <div class="form-group">
+                <label>Phone Number *</label>
+                <input type="text" name="phone" id="phone" required>
+                <div class="error" id="phone_error">Enter a 10 digit valid number</div>
+            </div>
+
+            <div class="form-group">
+                <label>Address *</label>
+                <input type="text" name="address" id="address" required>
+            </div>
+
+            <div class="form-group">
+                <label>Gender *</label>
+                <select name="gender" id="gender" required>
+                    <option value="">-- Select Gender --</option>
+                    <option value="Male">Male</option>
+                    <option value="Female">Female</option>
+                    <option value="Other">Other</option>
+                </select>
+                <div class="error" id="gender_error">Gender is required</div>
+            </div>
+
+            <div class="form-group">
+                <label>Date of Birth *</label>
+                <input type="date" name="dob" id="dob" required>
+            </div>
+
+            <div class="form-group">
+                <label>Profile Picture</label>
+                <input type="file" name="profile_picture" accept="image/*">
+            </div>
+
+            <button type="submit">Add Agent</button>
+        </form>
+    </div>
+
+    <footer>
+        &copy; 2025 Insurance CRM. All rights reserved.
+    </footer>
+
+    <script>
+        document.addEventListener("DOMContentLoaded", function () {
+            const firstName = document.getElementById("first_name");
+            const lastName = document.getElementById("last_name");
+            const email = document.getElementById("email");
+            const phone = document.getElementById("phone");
+            const gender = document.getElementById("gender");
+
+            // Add input listeners for live validation
+            firstName.addEventListener("input", function () {
+                if (!firstName.value.trim()) {
+                    showError("first_name_error");
+                } else {
+                    hideError("first_name_error");
+                }
+            });
+
+            lastName.addEventListener("input", function () {
+                if (!lastName.value.trim()) {
+                    showError("last_name_error");
+                } else {
+                    hideError("last_name_error");
+                }
+            });
+
+            email.addEventListener("input", function () {
+                const value = email.value.trim();
+                if (!value.includes("@") || (!value.endsWith(".com") && !value.endsWith(".in"))) {
+                    showError("email_error");
+                } else {
+                    hideError("email_error");
+                }
+            });
+
+            phone.addEventListener("input", function () {
+                const value = phone.value.trim();
+                if (!/^\d{10}$/.test(value)) {
+                    showError("phone_error");
+                } else {
+                    hideError("phone_error");
+                }
+            });
+
+            gender.addEventListener("change", function () {
+                if (!gender.value) {
+                    showError("gender_error");
+                } else {
+                    hideError("gender_error");
+                }
+            });
+
+            function showError(id) {
+                document.getElementById(id).style.display = "block";
+            }
+
+            function hideError(id) {
+                document.getElementById(id).style.display = "none";
+            }
+
+            // Also run final validation on submit
+            document.querySelector("form").addEventListener("submit", function (e) {
+                if (!validateForm()) {
+                    e.preventDefault(); // Prevent form submission if validation fails
+                }
+            });
+
+            function validateForm() {
+                let valid = true;
+
+                if (!firstName.value.trim()) {
+                    showError("first_name_error");
+                    valid = false;
+                }
+
+                if (!lastName.value.trim()) {
+                    showError("last_name_error");
+                    valid = false;
+                }
+
+                const emailValue = email.value.trim();
+                if (!emailValue.includes("@") || (!emailValue.endsWith(".com") && !emailValue.endsWith(".in"))) {
+                    showError("email_error");
+                    valid = false;
+                }
+
+                const phoneValue = phone.value.trim();
+                if (!/^\d{10}$/.test(phoneValue)) {
+                    showError("phone_error");
+                    valid = false;
+                }
+
+                if (!gender.value) {
+                    showError("gender_error");
+                    valid = false;
+                }
+
+                return valid;
+            }
+        });
+    </script>
+
+
+</body>
+
+</html>

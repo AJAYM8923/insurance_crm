@@ -1,0 +1,230 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Insurance CRM - Home</title>
+    <style>
+        /* Reset and global styles */
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: Arial, sans-serif;
+            line-height: 1.6;
+            background-color: #f4f4f4;
+        }
+
+        /* Navbar */
+        .navbar {
+            background-color: #003366;
+            color: white;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 15px 30px;
+            flex-wrap: wrap;
+        }
+
+        .navbar .brand {
+            font-size: 1.5rem;
+            font-weight: bold;
+        }
+
+        .navbar ul {
+            list-style: none;
+            display: flex;
+            gap: 20px;
+            flex-wrap: wrap;
+        }
+
+        .navbar ul li a {
+            color: white;
+            text-decoration: none;
+            font-weight: 500;
+        }
+
+        .login-btn {
+            background-color: #ff6600;
+            color: white;
+            padding: 8px 16px;
+            border: none;
+            border-radius: 5px;
+            text-decoration: none;
+            font-weight: bold;
+        }
+
+        /* Hero Section */
+        .hero {
+            background: url('https://via.placeholder.com/1600x600') no-repeat center center/cover;
+            height: 60vh;
+            color: white;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            text-align: center;
+            padding: 20px;
+        }
+
+        .hero h1 {
+            font-size: 3rem;
+            background-color: rgba(0, 0, 0, 0.6);
+            padding: 10px;
+            border-radius: 10px;
+        }
+
+        /* Features Section */
+        .features {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+            gap: 20px;
+            padding: 40px 30px;
+            background-color: white;
+        }
+
+        .feature-card {
+            background: #e6f0ff;
+            padding: 20px;
+            border-radius: 10px;
+            box-shadow: 0 2px 6px rgba(0, 0, 0, 0.1);
+        }
+
+        .feature-card h3 {
+            margin-bottom: 10px;
+            color: #003366;
+        }
+
+        /* Testimonials */
+        .testimonials {
+            padding: 40px 30px;
+            background-color: #f0f8ff;
+        }
+
+        .testimonial {
+            margin-bottom: 20px;
+        }
+
+        .testimonial p {
+            font-style: italic;
+            color: #333;
+        }
+
+        .testimonial h4 {
+            margin-top: 10px;
+            color: #003366;
+        }
+
+        /* Footer */
+        .footer {
+            background-color: #003366;
+            color: white;
+            text-align: center;
+            padding: 20px 10px;
+            margin-top: 20px;
+        }
+
+        /* Responsive adjustments */
+        @media (max-width: 768px) {
+            .navbar ul {
+                flex-direction: column;
+                align-items: center;
+                margin-top: 10px;
+            }
+
+            .hero h1 {
+                font-size: 2rem;
+            }
+        }
+    </style>
+</head>
+
+<body>
+
+    <!-- Navbar -->
+    <nav class="navbar">
+        <div class="brand">InsuranceCRM</div>
+        <ul>
+            <li><a href="#">Home</a></li>
+            <li><a href="#">Features</a></li>
+            <li><a href="#">Plans</a></li>
+            <li><a href="#">Contact</a></li>
+        </ul>
+        {% if user.is_authenticated and not user.is_superuser %}
+        <a href="{% url 'manage_clients' %}">Manage Clients</a>
+        <a href="{% url 'agent_dashboard' %}">Dashboard</a>
+        <a href="{% url 'agent_campaigns' %}" class="btn btn-primary">View My Campaigns</a>
+
+        {% endif %}
+        <!-- Navbar section of home.html -->
+
+
+
+
+        {% if user.is_authenticated %}
+        <span>Welcome, {{ user.first_name }}!</span>
+        <a href="{% url 'logout' %}" class="login-btn">Logout</a>
+        {% else %}
+        <a href="{% url 'login' %}" class="login-btn">Login</a>
+        {% endif %}
+
+    </nav>
+
+    <!-- Hero Section -->
+    <section class="hero">
+        <h1>Welcome to Your Smart Insurance CRM Dashboard</h1>
+    </section>
+
+    <!-- Features Section -->
+    <section class="features">
+        <div class="feature-card">
+            <h3>Lead Management</h3>
+            <p>Capture, track, and manage potential customers efficiently with automated follow-ups and reminders.</p>
+        </div>
+        <div class="feature-card">
+            <h3>Policy Tracking</h3>
+            <p>View, update, and monitor all active and expired insurance policies in one place.</p>
+        </div>
+        <div class="feature-card">
+            <h3>Client Database</h3>
+            <p>Maintain a comprehensive, searchable database of all clients and their policy history.</p>
+        </div>
+        <div class="feature-card">
+            <h3>Claim Management</h3>
+            <p>Track claims from submission to resolution with integrated document storage.</p>
+        </div>
+        <div class="feature-card">
+            <h3>Renewal Reminders</h3>
+            <p>Automatic alerts and reminders for upcoming renewals via email or SMS.</p>
+        </div>
+        <div class="feature-card">
+            <h3>Analytics Dashboard</h3>
+            <p>Visualize sales, client retention, and team performance through real-time data and reports.</p>
+        </div>
+    </section>
+
+    <!-- Testimonials Section -->
+    <section class="testimonials">
+        <h2 style="text-align: center; color: #003366; margin-bottom: 30px;">What Our Clients Say</h2>
+        <div class="testimonial">
+            <p>"This CRM has streamlined our entire workflow. Policy renewals and client tracking have never been
+                easier!"</p>
+            <h4>- Sarah Thomas, Insurance Broker</h4>
+        </div>
+        <div class="testimonial">
+            <p>"The built-in analytics give me deep insight into my team’s performance and client trends."</p>
+            <h4>- John Abraham, Regional Manager</h4>
+        </div>
+    </section>
+
+    <!-- Footer -->
+    <footer class="footer">
+        <p>&copy; 2025 InsuranceCRM. All rights reserved.</p>
+    </footer>
+
+</body>
+
+</html>

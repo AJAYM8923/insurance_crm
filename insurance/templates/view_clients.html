@@ -1,0 +1,110 @@
+<!-- templates/view_clients.html -->
+<!DOCTYPE html>
+<html>
+
+<head>
+    <title>Client List</title>
+    <style>
+        table {
+            border-collapse: collapse;
+            width: 100%;
+        }
+
+        th,
+        td {
+            padding: 8px;
+            border: 1px solid #ccc;
+            text-align: left;
+        }
+
+        th {
+            background-color: #f2f2f2;
+        }
+
+        .actions a {
+            margin-right: 10px;
+        }
+    </style>
+</head>
+
+<body>
+    <h2>Your Clients</h2>
+
+    <table>
+        <thead>
+            <tr>
+                <th>Name</th>
+                <th>Phone</th>
+                <th>Email</th>
+                <th>Address</th>
+                <th>Age</th>
+                <th>DOB</th>
+                <th>Qualification</th>
+                <th>Profession</th>
+                <th>Aadhar</th>
+                <th>PAN</th>
+                <th>Income</th>
+                <th>Marital Status</th>
+                <th>Have Kids</th>
+                <th>How Know About Us</th>
+                <th>Existing Profile</th>
+                <th>Customer Service</th>
+                <th>Claim Satisfaction</th>
+                <th>Visited Policy</th>
+                <th>Willing to Purchase</th>
+                <th>Willing to Share Prev</th>
+                <th>Prev Insurance Number</th>
+                <th>Prev Insurance Name</th>
+                <th>Prev Insurance Claimed</th>
+                <th>willingness to switch</th>
+                <th>Preferences</th>
+                <th>Agent Note</th>
+                <th>Campaign</th>
+                <th>Actions</th>
+            </tr>
+        </thead>
+        <tbody>
+            {% for client in clients %}
+            <tr>
+                <td>{{ client.name }}</td>
+                <td>{{ client.phone }}</td>
+                <td>{{ client.email }}</td>
+                <td>{{ client.address }}</td>
+                <td>{{ client.age }}</td>
+                <td>{{ client.dob }}</td>
+                <td>{{ client.qualification }}</td>
+                <td>{{ client.profession }}</td>
+                <td>{{ client.aadhar }}</td>
+                <td>{{ client.pan }}</td>
+                <td>{{ client.income }}</td>
+                <td>{{ client.marital_status }}</td>
+                <td>{{ client.have_kids }}</td>
+                <td>{{ client.know_about_us }}</td>
+                <td>{{ client.existing_profile }}</td>
+                <td>{{ client.customer_service }}</td>
+                <td>{{ client.claim_satisfaction }}</td>
+                <td>{{ client.visited_policy }}</td>
+                <td>{{ client.willingness_to_purchase }}</td>
+                <td>{{ client.willingness_to_share_prev }}</td>
+                <td>{{ client.prev_insurance_number }}</td>
+                <td>{{ client.prev_insurance_name }}</td>
+                <td>{{ client.prev_insurance_claimed }}</td>
+                <td>{{ client.willingness_to_switch }}</td>
+                <td>{{ client.preferences }}</td>
+                <td>{{ client.agent_note }}</td>
+                <td>{{ client.campaign.name }}</td>
+                <td class="actions">
+                    <a href="{% url 'edit_client' client.id %}">Edit</a>
+                    <a href="{% url 'delete_client' client.id %}">Delete</a>
+                </td>
+            </tr>
+            {% empty %}
+            <tr>
+                <td colspan="27">No clients found.</td>
+            </tr>
+            {% endfor %}
+        </tbody>
+    </table>
+</body>
+
+</html>

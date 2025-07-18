@@ -1,0 +1,257 @@
+{% load static %}
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <title>Clients of {{ agent.user.get_full_name }}</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <style>
+        /* Global Layout */
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            display: flex;
+            min-height: 100vh;
+            background-color: #f4f7fa;
+        }
+
+        /* Sidebar */
+        .sidebar {
+            width: 220px;
+            background-color: #2a3f54;
+            color: #fff;
+            position: fixed;
+            height: 100vh;
+            padding: 20px;
+        }
+
+        .sidebar h2 {
+            margin-bottom: 30px;
+            font-size: 22px;
+            text-align: center;
+            color: #f9c74f;
+        }
+
+        .sidebar ul {
+            list-style: none;
+        }
+
+        .sidebar ul li {
+            margin: 15px 0;
+        }
+
+        .sidebar ul li a {
+            text-decoration: none;
+            color: #fff;
+            padding: 10px;
+            display: block;
+            border-radius: 4px;
+            transition: background 0.3s;
+        }
+
+        .sidebar ul li a:hover {
+            background-color: #1a2732;
+        }
+
+        /* Main Content */
+        .main-content {
+            margin-left: 220px;
+            padding: 30px;
+            flex: 1;
+        }
+
+        h2 {
+            font-size: 26px;
+            text-align: center;
+            margin-bottom: 30px;
+            color: #003366;
+        }
+
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            background: #fff;
+            box-shadow: 0 0 8px rgba(0, 0, 0, 0.05);
+        }
+
+        th,
+        td {
+            padding: 12px;
+            border: 1px solid #ddd;
+            text-align: left;
+            vertical-align: top;
+        }
+
+        thead tr {
+            background-color: #003366;
+            color: white;
+        }
+
+        tbody tr:nth-child(even) {
+            background-color: #f9f9f9;
+        }
+
+        a {
+            color: #003366;
+            text-decoration: none;
+            display: inline-block;
+            margin-top: 20px;
+        }
+
+        a:hover {
+            text-decoration: underline;
+        }
+
+        p {
+            font-size: 16px;
+            margin-top: 20px;
+            color: #555;
+        }
+
+        /* Footer */
+        footer {
+            background-color: #2a3f54;
+            color: #fff;
+            text-align: center;
+            padding: 12px;
+            position: fixed;
+            bottom: 0;
+            width: 100%;
+            left: 0;
+        }
+
+        @media (max-width: 768px) {
+            .sidebar {
+                width: 100%;
+                height: auto;
+                position: relative;
+            }
+
+            .main-content {
+                margin-left: 0;
+                padding: 20px;
+            }
+
+            table,
+            thead,
+            tbody,
+            th,
+            td,
+            tr {
+                font-size: 14px;
+            }
+
+            footer {
+                position: relative;
+            }
+        }
+    </style>
+</head>
+
+<body>
+    <!-- Sidebar -->
+    <div class="sidebar">
+        <h2>Admin Panel</h2>
+        <ul>
+            <li><a href="{% url 'admin_dashboard' %}">Dashboard</a></li>
+            <li><a href="{% url 'add_agents' %}">Add Agents</a></li>
+            <li><a href="{% url 'manage_campaigns' %}">Add Campaigns</a></li>
+            <li><a href="{% url 'all_agents' %}">All Agents</a></li>
+            <li><a href="{% url 'all_campaigns' %}">View Campaigns</a></li>
+            <li><a href="{% url 'logout' %}">Logout</a></li>
+        </ul>
+    </div>
+
+    <!-- Main Content -->
+    <div class="main-content">
+        <h2>Clients Assigned to {{ agent.user.get_full_name }}</h2>
+
+        {% if clients %}
+        <table>
+            <thead>
+                <tr>
+                    <th>Name</th>
+                    <th>Phone</th>
+                    <th>Email</th>
+                    <th>Address</th>
+                    <th>Age</th>
+                    <th>DOB</th>
+                    <th>Qualification</th>
+                    <th>Profession</th>
+                    <th>Aadhar</th>
+                    <th>PAN</th>
+                    <th>Income</th>
+                    <th>Marital Status</th>
+                    <th>Kids</th>
+                    <th>Source</th>
+                    <th>Existing Profile</th>
+                    <th>Customer Service</th>
+                    <th>Claim Satisfaction</th>
+                    <th>Visited Policy</th>
+                    <th>Willing to Purchase</th>
+                    <th>Willing to Share Previous</th>
+                    <th>Previous Insurance Number</th>
+                    <th>Previous Insurance Name</th>
+                    <th>Previous Claimed</th>
+                    <th>Willingness to Switch</th>
+                    <th>Preferences</th>
+                    <th>Agent Note</th>
+                    <th>Campaign</th>
+                    <th>Created At</th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for client in clients %}
+                <tr>
+                    <td>{{ client.name }}</td>
+                    <td>{{ client.phone }}</td>
+                    <td>{{ client.email }}</td>
+                    <td>{{ client.address }}</td>
+                    <td>{{ client.age }}</td>
+                    <td>{{ client.dob }}</td>
+                    <td>{{ client.qualification }}</td>
+                    <td>{{ client.profession }}</td>
+                    <td>{{ client.aadhar }}</td>
+                    <td>{{ client.pan }}</td>
+                    <td>{{ client.income }}</td>
+                    <td>{{ client.marital_status }}</td>
+                    <td>{{ client.have_kids }}</td>
+                    <td>{{ client.know_about_us }}</td>
+                    <td>{{ client.existing_profile }}</td>
+                    <td>{{ client.customer_service }}</td>
+                    <td>{{ client.claim_satisfaction }}</td>
+                    <td>{{ client.visited_policy }}</td>
+                    <td>{{ client.willingness_to_purchase }}</td>
+                    <td>{{ client.willingness_to_share_prev }}</td>
+                    <td>{{ client.prev_insurance_number }}</td>
+                    <td>{{ client.prev_insurance_name }}</td>
+                    <td>{{ client.prev_insurance_claimed }}</td>
+                    <td>{{ client.willingness_to_switch }}</td>
+                    <td>{{ client.preferences }}</td>
+                    <td>{{ client.agent_note }}</td>
+                    <td>{{ client.campaign.name }}</td>
+                    <td>{{ client.created_at }}</td>
+                </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+        {% else %}
+        <p>No clients found for this agent.</p>
+        {% endif %}
+
+        <a href="{% url 'add_agents' %}">← Back to Agents</a>
+    </div>
+
+    <!-- Footer -->
+    <footer>
+        &copy; 2025 Insurance CRM. All rights reserved.
+    </footer>
+</body>
+
+</html>

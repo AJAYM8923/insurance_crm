@@ -1,0 +1,295 @@
+{% load static %}
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <title>Edit Agent</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <style>
+    * {
+      margin: 0;
+      padding: 0;
+      box-sizing: border-box;
+    }
+
+    body {
+      font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+      display: flex;
+      min-height: 100vh;
+      background-color: #f4f7fa;
+    }
+
+    .sidebar {
+      width: 220px;
+      background-color: #2a3f54;
+      color: #fff;
+      position: fixed;
+      height: 100vh;
+      padding: 20px;
+    }
+
+    .sidebar h2 {
+      margin-bottom: 30px;
+      font-size: 22px;
+      text-align: center;
+      color: #f9c74f;
+    }
+
+    .sidebar ul {
+      list-style: none;
+    }
+
+    .sidebar ul li {
+      margin: 15px 0;
+    }
+
+    .sidebar ul li a {
+      text-decoration: none;
+      color: #fff;
+      padding: 10px;
+      display: block;
+      border-radius: 4px;
+      transition: background 0.3s;
+    }
+
+    .sidebar ul li a:hover {
+      background-color: #1a2732;
+    }
+
+    .main-content {
+      margin-left: 220px;
+      padding: 30px;
+      flex: 1;
+    }
+
+    h2 {
+      margin-bottom: 25px;
+      color: #003366;
+      text-align: center;
+    }
+
+    form {
+      max-width: 600px;
+      margin: 0 auto;
+      background: #fff;
+      padding: 30px;
+      border-radius: 10px;
+      box-shadow: 0 0 8px rgba(0, 0, 0, 0.05);
+    }
+
+    label {
+      display: block;
+      margin-bottom: 8px;
+      margin-top: 20px;
+      color: #333;
+    }
+
+    input[type="text"],
+    input[type="email"],
+    input[type="date"],
+    input[type="file"],
+    select {
+      width: 100%;
+      padding: 10px;
+      border: 1px solid #ccc;
+      border-radius: 6px;
+      margin-bottom: 10px;
+      transition: border-color 0.3s;
+    }
+
+    button {
+      width: 100%;
+      padding: 12px;
+      background-color: #003366;
+      color: white;
+      border: none;
+      border-radius: 6px;
+      margin-top: 20px;
+      cursor: pointer;
+      font-size: 16px;
+    }
+
+    button:hover {
+      background-color: #002244;
+    }
+
+    img {
+      margin-top: 10px;
+      border-radius: 4px;
+    }
+
+    .success-msg,
+    .error-msg {
+      padding: 10px;
+      border-radius: 5px;
+      margin-bottom: 15px;
+      font-weight: bold;
+    }
+
+    .success-msg {
+      background-color: #d4edda;
+      color: #155724;
+    }
+
+    .error-msg {
+      background-color: #f8d7da;
+      color: #721c24;
+    }
+
+    footer {
+      background-color: #2a3f54;
+      color: #fff;
+      text-align: center;
+      padding: 12px;
+      position: fixed;
+      bottom: 0;
+      width: 100%;
+      left: 0;
+    }
+
+    @media (max-width: 768px) {
+      .sidebar {
+        width: 100%;
+        height: auto;
+        position: relative;
+      }
+
+      .main-content {
+        margin-left: 0;
+        padding: 20px;
+      }
+
+      form {
+        padding: 20px;
+      }
+
+      footer {
+        position: relative;
+      }
+    }
+  </style>
+</head>
+<body>
+
+  <!-- Sidebar -->
+  <div class="sidebar">
+    <h2>Admin Panel</h2>
+    <ul>
+            <li><a href="{% url 'admin_dashboard' %}">Dashboard</a></li>
+            <li><a href="{% url 'add_agents' %}">Add Agents</a></li>
+            <li><a href="{% url 'manage_campaigns' %}">Add Campaigns</a></li>
+            <li><a href="{% url 'all_agents' %}">All Agents</a></li>
+            <li><a href="{% url 'all_campaigns' %}">View Campaigns</a></li>
+            <li><a href="{% url 'logout' %}">Logout</a></li>
+    </ul>
+  </div>
+
+  <!-- Main Content -->
+  <div class="main-content">
+    <form method="POST" enctype="multipart/form-data">
+      {% csrf_token %}
+      <h2>Edit Agent</h2>
+
+      {% for message in messages %}
+      <div class="{{ message.tags }}-msg">{{ message }}</div>
+      {% endfor %}
+
+      <label>First Name:</label>
+      <input type="text" name="first_name" value="{{ agent.user.first_name }}" required>
+
+      <label>Last Name:</label>
+      <input type="text" name="last_name" value="{{ agent.user.last_name }}" required>
+
+      <label>Email:</label>
+      <input type="email" name="email" value="{{ agent.user.email }}" required>
+
+      <label>Phone:</label>
+      <input type="text" name="phone" value="{{ agent.phone }}" required>
+
+      <label>Address:</label>
+      <input type="text" name="address" value="{{ agent.address }}" required>
+
+      <label>Gender:</label>
+      <select name="gender" required>
+        <option value="Male" {% if agent.gender == 'Male' %}selected{% endif %}>Male</option>
+        <option value="Female" {% if agent.gender == 'Female' %}selected{% endif %}>Female</option>
+        <option value="Other" {% if agent.gender == 'Other' %}selected{% endif %}>Other</option>
+      </select>
+
+      <label>DOB:</label>
+      <input type="date" name="dob" value="{{ agent.dob|date:'Y-m-d' }}" required>
+
+      <label>Profile Picture:</label>
+      {% if agent.profile_picture %}
+      <img src="{{ agent.profile_picture.url }}" width="60"><br>
+      {% endif %}
+      <input type="file" name="profile_picture" accept="image/*">
+
+      <button type="submit">Update Agent</button>
+    </form>
+  </div>
+
+  <!-- Footer -->
+  <footer>
+    &copy; 2025 Insurance CRM. All rights reserved.
+  </footer>
+
+  <!-- JS Validation -->
+  <script>
+    document.addEventListener('DOMContentLoaded', () => {
+      const form = document.querySelector('form');
+      const emailInput = document.querySelector('input[name="email"]');
+      const phoneInput = document.querySelector('input[name="phone"]');
+
+      const emailError = document.createElement('div');
+      emailError.style.color = 'red';
+      emailInput.parentNode.insertBefore(emailError, emailInput.nextSibling);
+
+      const phoneError = document.createElement('div');
+      phoneError.style.color = 'red';
+      phoneInput.parentNode.insertBefore(phoneError, phoneInput.nextSibling);
+
+      const isValidEmail = (email) => /^[^\s@]+@[^\s@]+\.(com|in)$/.test(email);
+      const isValidPhone = (phone) => /^\d{10}$/.test(phone);
+
+      emailInput.addEventListener('input', () => {
+        if (!isValidEmail(emailInput.value.trim())) {
+          emailError.textContent = "Enter a valid email ending with .com or .in";
+          emailInput.style.borderColor = "red";
+        } else {
+          emailError.textContent = "";
+          emailInput.style.borderColor = "green";
+        }
+      });
+
+      phoneInput.addEventListener('input', () => {
+        if (!isValidPhone(phoneInput.value.trim())) {
+          phoneError.textContent = "Enter a valid 10-digit phone number";
+          phoneInput.style.borderColor = "red";
+        } else {
+          phoneError.textContent = "";
+          phoneInput.style.borderColor = "green";
+        }
+      });
+
+      form.addEventListener('submit', function (event) {
+        let valid = true;
+
+        if (!isValidEmail(emailInput.value.trim())) {
+          emailError.textContent = "Enter a valid email ending with .com or .in";
+          emailInput.style.borderColor = "red";
+          valid = false;
+        }
+
+        if (!isValidPhone(phoneInput.value.trim())) {
+          phoneError.textContent = "Enter a valid 10-digit phone number";
+          phoneInput.style.borderColor = "red";
+          valid = false;
+        }
+
+        if (!valid) event.preventDefault();
+      });
+    });
+  </script>
+</body>
+</html>

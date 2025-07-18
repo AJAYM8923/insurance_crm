@@ -1,0 +1,30 @@
+<div class="container mt-5">
+    <h2 class="mb-4">My Campaigns</h2>
+
+    {% if campaigns %}
+    <table class="table table-bordered">
+        <thead>
+            <tr>
+                <th>Name</th>
+                <th>Date</th>
+                <th>Location</th>
+                <th>Latitude</th>
+                <th>Longitude</th>
+            </tr>
+        </thead>
+        <tbody>
+            {% for campaign in campaigns %}
+            <tr>
+                <td>{{ campaign.name }}</td>
+                <td>{{ campaign.date }}</td>
+                <td>{{ campaign.location }}</td>
+                <td>{{ campaign.latitude|default:"-" }}</td>
+                <td>{{ campaign.longitude|default:"-" }}</td>
+            </tr>
+            {% endfor %}
+        </tbody>
+    </table>
+    {% else %}
+    <p>No campaigns assigned yet.</p>
+    {% endif %}
+</div>

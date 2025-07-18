@@ -1,0 +1,196 @@
+<!DOCTYPE html>
+<html>
+
+<head>
+    <title>Agent Dashboard</title>
+    <style>
+        input,
+        select {
+            margin: 5px 0;
+            width: 100%;
+            padding: 8px;
+        }
+
+        .error {
+            color: red;
+        }
+
+        .success {
+            color: green;
+        }
+    </style>
+</head>
+
+<body>
+    <h2>Edit Profile</h2>
+    <div id="msg"></div>
+
+    <form id="profileForm" enctype="multipart/form-data">
+        {% csrf_token %}
+        <label>First Name:</label>
+        <input type="text" name="first_name" value="{{ agent.user.first_name }}" required>
+
+        <label>Last Name:</label>
+        <input type="text" name="last_name" value="{{ agent.user.last_name }}" required>
+
+        <label>Email:</label>
+        <input type="email" name="email" value="{{ agent.user.email }}" required>
+
+        <label>Phone:</label>
+        <input type="text" name="phone" value="{{ agent.phone }}" required>
+
+        <label>Address:</label>
+        <input type="text" name="address" value="{{ agent.address }}" required>
+
+        <label>Gender:</label>
+        <select name="gender">
+            <option value="Male" {% if agent.gender == "Male" %}selected{% endif %}>Male</option>
+            <option value="Female" {% if agent.gender == "Female" %}selected{% endif %}>Female</option>
+            <option value="Other" {% if agent.gender == "Other" %}selected{% endif %}>Other</option>
+        </select>
+
+        <label>Date of Birth:</label>
+        <input type="date" name="dob" value="{{ agent.dob|date:'Y-m-d' }}" required>
+
+        <label>Current Profile Picture:</label><br>
+{% if agent.profile_picture %}
+    <img src="{{ agent.profile_picture.url }}" alt="Profile Picture" style="width: 100px; height: 100px; object-fit: cover; border: 1px solid #ccc; border-radius: 5px;"><br><br>
+{% else %}
+    <p>No profile picture uploaded.</p>
+{% endif %}
+
+<label>Change Profile Picture:</label>
+<input type="file" name="profile_picture" accept="image/*">
+
+
+        <button type="submit">Update</button>
+    </form>
+
+    <h2>Reset Password</h2>
+    <form id="passwordForm">
+        {% csrf_token %}
+        <label>Current Password:</label>
+        <input type="password" name="current_password" required>
+
+        <label>New Password:</label>
+        <input type="password" name="new_password" required>
+
+        <label>Confirm New Password:</label>
+        <input type="password" name="confirm_password" required>
+
+        <button type="submit">Reset Password</button>
+    </form>
+
+    <script>
+    const profileForm = document.getElementById("profileForm");
+    const phoneInput = document.querySelector('input[name="phone"]');
+    const emailInput = document.querySelector('input[name="email"]');
+    const msg = document.getElementById("msg");
+
+    const phoneError = document.createElement("div");
+    const emailError = document.createElement("div");
+
+    phoneError.style.color = "red";
+    phoneError.style.fontSize = "14px";
+    emailError.style.color = "red";
+    emailError.style.fontSize = "14px";
+
+    phoneInput.parentNode.insertBefore(phoneError, phoneInput.nextSibling);
+    emailInput.parentNode.insertBefore(emailError, emailInput.nextSibling);
+
+    function validateEmail(email) {
+        const regex = /^[^@]+@[^@]+\.(com|in)$/;
+        return regex.test(email);
+    }
+
+    function validatePhone(phone) {
+        return /^\d{10}$/.test(phone); // exactly 10 digits
+    }
+
+    // Live phone validation
+    phoneInput.addEventListener("input", function () {
+        this.value = this.value.replace(/\D/g, "").slice(0, 10); // allow only 10 digits
+
+        if (!validatePhone(this.value)) {
+            phoneError.innerText = "Phone must be exactly 10 digits.";
+        } else {
+            phoneError.innerText = "";
+        }
+    });
+
+    // Live email validation
+    emailInput.addEventListener("input", function () {
+        if (!validateEmail(this.value.trim())) {
+            emailError.innerText = "Invalid email format (must end with .com or .in)";
+        } else {
+            emailError.innerText = "";
+        }
+    });
+
+    profileForm.addEventListener("submit", function (e) {
+        e.preventDefault();
+        msg.innerText = "";
+        msg.className = "";
+
+        const phone = phoneInput.value.trim();
+        const email = emailInput.value.trim();
+
+        let hasError = false;
+
+        if (!validatePhone(phone)) {
+            phoneError.innerText = "Phone must be exactly 10 digits.";
+            hasError = true;
+        }
+
+        if (!validateEmail(email)) {
+            emailError.innerText = "Invalid email format (must end with .com or .in)";
+            hasError = true;
+        }
+
+        if (hasError) return;
+
+        // Submit with fetch
+        const formData = new FormData(profileForm);
+        fetch("{% url 'agent_dashboard' %}", {
+            method: "POST",
+            body: formData
+        })
+        .then(res => res.json())
+        .then(data => {
+            msg.innerText = data.message;
+            msg.className = data.status;
+        });
+    });
+</script>
+<script>
+    const passwordForm = document.getElementById("passwordForm");
+
+    passwordForm.addEventListener("submit", function (e) {
+        e.preventDefault();
+        const formData = new FormData(passwordForm);
+
+        fetch("{% url 'reset_agent_password' %}", {
+            method: "POST",
+            headers: {
+                "X-CSRFToken": formData.get("csrfmiddlewaretoken")
+            },
+            body: formData,
+        })
+        .then(res => res.json())
+        .then(data => {
+            const msgDiv = document.getElementById("msg");
+            msgDiv.innerText = data.message;
+            msgDiv.className = data.status;
+
+            if (data.status === "success") {
+                setTimeout(() => {
+                    window.location.href = "{% url 'login' %}";  // Redirect to login page after logout
+                }, 2000);
+            }
+        });
+    });
+</script>
+
+</body>
+
+</html>
