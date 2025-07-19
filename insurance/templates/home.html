@@ -2,11 +2,10 @@
 <html lang="en">
 
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <title>Insurance CRM - Home</title>
     <style>
-        /* Reset and global styles */
         * {
             margin: 0;
             padding: 0;
@@ -14,209 +13,275 @@
         }
 
         body {
-            font-family: Arial, sans-serif;
-            line-height: 1.6;
-            background-color: #f4f4f4;
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background-color: #eef2f7;
+            color: #222;
         }
 
-        /* Navbar */
-        .navbar {
-            background-color: #003366;
-            color: white;
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-            padding: 15px 30px;
-            flex-wrap: wrap;
-        }
-
-        .navbar .brand {
-            font-size: 1.5rem;
-            font-weight: bold;
-        }
-
-        .navbar ul {
-            list-style: none;
-            display: flex;
-            gap: 20px;
-            flex-wrap: wrap;
-        }
-
-        .navbar ul li a {
-            color: white;
+        a {
             text-decoration: none;
+            display: block;
+            padding: 10px;
+            color: white;
             font-weight: 500;
         }
 
-        .login-btn {
-            background-color: #ff6600;
+        .navbar {
+            background-color: #002244;
+            padding: 15px 30px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            flex-wrap: wrap;
+            position: relative;
+            z-index: 10;
+        }
+
+        .navbar .brand {
             color: white;
-            padding: 8px 16px;
-            border: none;
-            border-radius: 5px;
-            text-decoration: none;
+            font-size: 1.8rem;
             font-weight: bold;
         }
 
-        /* Hero Section */
-        .hero {
-            background: url('https://via.placeholder.com/1600x600') no-repeat center center/cover;
-            height: 60vh;
-            color: white;
+        .nav-links {
             display: flex;
+            gap: 20px;
             align-items: center;
-            justify-content: center;
+        }
+
+        .nav-links a:hover {
+            background-color: #003366;
+            border-radius: 5px;
+        }
+
+        .dropdown {
+            position: relative;
+        }
+
+        .dropdown-content {
+            display: none;
+            position: absolute;
+            top: 100%;
+            left: 0;
+            background-color: #004080;
+            border-radius: 5px;
+            flex-direction: column;
+            min-width: 160px;
+            padding: 10px 0;
+            z-index: 99;
+        }
+
+        .dropdown-content a {
+            padding: 10px 20px;
+            color: white;
+            display: block;
+        }
+
+        .dropdown-content a:hover {
+            background-color: #0059b3;
+        }
+
+        .dropdown:hover .dropdown-content {
+            display: flex;
+        }
+
+        .hero {
+            background-color: #003366;
+            color: white;
+            padding: 80px 30px;
             text-align: center;
-            padding: 20px;
         }
 
         .hero h1 {
             font-size: 3rem;
-            background-color: rgba(0, 0, 0, 0.6);
-            padding: 10px;
-            border-radius: 10px;
+            margin-bottom: 20px;
         }
 
-        /* Features Section */
-        .features {
-            display: grid;
-            grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+        .hero p {
+            font-size: 1.2rem;
+            max-width: 700px;
+            margin: 0 auto 20px;
+        }
+
+        .hero .cta {
+            background: #ff6600;
+            color: white;
+            padding: 12px 25px;
+            font-weight: bold;
+            border-radius: 5px;
+            display: inline-block;
+        }
+
+        .section {
+            padding: 60px 10%;
+            display: flex;
+            flex-direction: column;
             gap: 20px;
-            padding: 40px 30px;
-            background-color: white;
+            background-color: #fff;
+            border-bottom: 1px solid #ddd;
         }
 
-        .feature-card {
-            background: #e6f0ff;
-            padding: 20px;
-            border-radius: 10px;
-            box-shadow: 0 2px 6px rgba(0, 0, 0, 0.1);
-        }
-
-        .feature-card h3 {
+        .section h2 {
+            font-size: 2rem;
+            color: #002244;
             margin-bottom: 10px;
-            color: #003366;
         }
 
-        /* Testimonials */
-        .testimonials {
-            padding: 40px 30px;
-            background-color: #f0f8ff;
+        .section p {
+            font-size: 1.1rem;
+            line-height: 1.6;
+        }
+
+        .testimonial-section {
+            padding: 60px 20px;
+            text-align: center;
+            background-color: #f5f7fa;
+        }
+
+        .testimonial-section h2 {
+            color: #003366;
+            font-size: 2rem;
+            margin-bottom: 30px;
         }
 
         .testimonial {
-            margin-bottom: 20px;
+            max-width: 600px;
+            margin: 0 auto;
+            background: white;
+            padding: 30px;
+            border-radius: 10px;
+            box-shadow: 0 0 10px rgba(0, 0, 0, 0.05);
         }
 
         .testimonial p {
             font-style: italic;
-            color: #333;
+            color: #444;
+            margin-bottom: 10px;
         }
 
         .testimonial h4 {
-            margin-top: 10px;
             color: #003366;
         }
 
-        /* Footer */
         .footer {
-            background-color: #003366;
+            background-color: #002244;
             color: white;
             text-align: center;
-            padding: 20px 10px;
-            margin-top: 20px;
+            padding: 20px;
+            margin-top: 40px;
         }
 
-        /* Responsive adjustments */
+        .menu-toggle {
+            display: none;
+            color: white;
+            font-size: 1.8rem;
+            cursor: pointer;
+        }
+
         @media (max-width: 768px) {
-            .navbar ul {
+            .nav-links {
+                display: none;
                 flex-direction: column;
-                align-items: center;
-                margin-top: 10px;
+                background-color: #002244;
+                width: 100%;
+                padding: 10px 0;
             }
 
-            .hero h1 {
-                font-size: 2rem;
+            .nav-links.show {
+                display: flex;
+            }
+
+            .menu-toggle {
+                display: block;
+            }
+
+            .dropdown-content {
+                position: static;
+                border: none;
+                box-shadow: none;
+                background-color: #003366;
+                width: 100%;
+            }
+
+            .dropdown-content a {
+                padding: 12px 20px;
+                text-align: left;
+            }
+
+            .dropdown:hover .dropdown-content {
+                display: none;
+            }
+
+            .dropdown:focus-within .dropdown-content {
+                display: flex;
+            }
+
+            .dropdown {
+                width: 100%;
             }
         }
     </style>
+    <script>
+        function toggleMenu() {
+            document.querySelector('.nav-links').classList.toggle('show');
+        }
+    </script>
 </head>
 
 <body>
-
     <!-- Navbar -->
     <nav class="navbar">
         <div class="brand">InsuranceCRM</div>
-        <ul>
-            <li><a href="#">Home</a></li>
-            <li><a href="#">Features</a></li>
-            <li><a href="#">Plans</a></li>
-            <li><a href="#">Contact</a></li>
-        </ul>
-        {% if user.is_authenticated and not user.is_superuser %}
-        <a href="{% url 'manage_clients' %}">Manage Clients</a>
-        <a href="{% url 'agent_dashboard' %}">Dashboard</a>
-        <a href="{% url 'agent_campaigns' %}" class="btn btn-primary">View My Campaigns</a>
+        <div class="menu-toggle" onclick="toggleMenu()">☰</div>
+        <div class="nav-links">
+            {% if user.is_authenticated and not user.is_superuser %}
+            <div class="dropdown" tabindex="0">
+                <a href="#">Clients ▾</a>
+                <div class="dropdown-content">
+                    <a href="{% url 'manage_clients' %}">Add Client</a>
+                    <a href="{% url 'view_clients' %}">View Clients</a>
+                    <a href="{% url 'agent_campaigns' %}">My Campaigns</a>
+                </div>
+            </div>
+            <a href="{% url 'agent_account' %}">My Account</a>
+            {% endif %}
 
-        {% endif %}
-        <!-- Navbar section of home.html -->
-
-
-
-
-        {% if user.is_authenticated %}
-        <span>Welcome, {{ user.first_name }}!</span>
-        <a href="{% url 'logout' %}" class="login-btn">Logout</a>
-        {% else %}
-        <a href="{% url 'login' %}" class="login-btn">Login</a>
-        {% endif %}
-
+            {% if user.is_authenticated %}
+            <span style="color:white; padding: 10px;">Welcome, {{ user.first_name }}!</span>
+            <a href="{% url 'logout' %}">Logout</a>
+            {% else %}
+            <a href="{% url 'login' %}" class="login-btn"
+                style="background:white; color:#002244; border-radius:5px;">Login</a>
+            {% endif %}
+        </div>
     </nav>
 
     <!-- Hero Section -->
     <section class="hero">
-        <h1>Welcome to Your Smart Insurance CRM Dashboard</h1>
+        <h1>Manage Policies. Empower Clients.</h1>
+        <p>Everything you need to build strong customer relationships and streamline your insurance workflow.</p>
+        <a href="{% url 'login' %}" class="cta">Get Started</a>
     </section>
 
-    <!-- Features Section -->
-    <section class="features">
-        <div class="feature-card">
-            <h3>Lead Management</h3>
-            <p>Capture, track, and manage potential customers efficiently with automated follow-ups and reminders.</p>
-        </div>
-        <div class="feature-card">
-            <h3>Policy Tracking</h3>
-            <p>View, update, and monitor all active and expired insurance policies in one place.</p>
-        </div>
-        <div class="feature-card">
-            <h3>Client Database</h3>
-            <p>Maintain a comprehensive, searchable database of all clients and their policy history.</p>
-        </div>
-        <div class="feature-card">
-            <h3>Claim Management</h3>
-            <p>Track claims from submission to resolution with integrated document storage.</p>
-        </div>
-        <div class="feature-card">
-            <h3>Renewal Reminders</h3>
-            <p>Automatic alerts and reminders for upcoming renewals via email or SMS.</p>
-        </div>
-        <div class="feature-card">
-            <h3>Analytics Dashboard</h3>
-            <p>Visualize sales, client retention, and team performance through real-time data and reports.</p>
-        </div>
+    <!-- Feature Section 1 -->
+    <section class="section">
+        <h2>All-in-One Dashboard</h2>
+        <p>Access lead generation, policy tracking, and client communications from a single, intuitive platform.</p>
     </section>
 
-    <!-- Testimonials Section -->
-    <section class="testimonials">
-        <h2 style="text-align: center; color: #003366; margin-bottom: 30px;">What Our Clients Say</h2>
+    <!-- Feature Section 2 -->
+    <section class="section" style="background-color: #f0f8ff;">
+        <h2>Visualize Your Growth</h2>
+        <p>Understand customer trends, team performance, and campaign ROI through real-time analytics and reports.</p>
+    </section>
+
+    <!-- Testimonial -->
+    <section class="testimonial-section">
+        <h2>Trusted by Professionals</h2>
         <div class="testimonial">
-            <p>"This CRM has streamlined our entire workflow. Policy renewals and client tracking have never been
-                easier!"</p>
-            <h4>- Sarah Thomas, Insurance Broker</h4>
-        </div>
-        <div class="testimonial">
-            <p>"The built-in analytics give me deep insight into my team’s performance and client trends."</p>
-            <h4>- John Abraham, Regional Manager</h4>
+            <p>"InsuranceCRM has transformed the way I manage my clients. It’s intuitive, smart, and saves me hours each
+                week."</p>
+            <h4>- Sarah Thomas, Insurance Consultant</h4>
         </div>
     </section>
 
@@ -224,7 +289,6 @@
     <footer class="footer">
         <p>&copy; 2025 InsuranceCRM. All rights reserved.</p>
     </footer>
-
 </body>
 
 </html>

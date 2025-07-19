@@ -15,21 +15,37 @@
             box-sizing: border-box;
         }
 
-        body {
-            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
-            display: flex;
-            min-height: 100vh;
-            background-color: #f4f7fa;
+        html, body {
+            height: 100%;
         }
 
-        /* Sidebar */
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background-color: #f4f7fa;
+            min-height: 100vh;
+        }
+
+        .menu-toggle {
+            display: none;
+            background-color: #2a3f54;
+            color: white;
+            padding: 15px;
+            font-size: 1.2rem;
+            text-align: center;
+            cursor: pointer;
+        }
+
+        .container {
+            display: flex;
+            flex: 1;
+        }
+
         .sidebar {
             width: 220px;
             background-color: #2a3f54;
             color: #fff;
-            position: fixed;
-            height: 100vh;
             padding: 20px;
+            transition: all 0.3s ease;
         }
 
         .sidebar h2 {
@@ -53,11 +69,10 @@
             background-color: #1a2732;
         }
 
-        /* Main Content */
         .main-content {
-            margin-left: 220px;
-            padding: 30px;
             flex: 1;
+            padding: 30px;
+            padding-bottom: 40px;
         }
 
         h2 {
@@ -71,7 +86,7 @@
             background-color: #fff;
             padding: 30px;
             border-radius: 8px;
-            max-width: 700px;
+            max-width: 900px;
             margin: 0 auto;
             box-shadow: 0 0 8px rgba(0, 0, 0, 0.05);
         }
@@ -128,32 +143,40 @@
             border: 1px solid #9f9;
         }
 
-        /* Footer */
         footer {
             background-color: #2a3f54;
             color: #fff;
             text-align: center;
             padding: 12px;
-            position: fixed;
-            bottom: 0;
             width: 100%;
-            left: 0;
         }
 
         @media (max-width: 768px) {
+            .container {
+                flex-direction: column;
+            }
+
+            .menu-toggle {
+                display: block;
+            }
+
             .sidebar {
+                display: none;
                 width: 100%;
                 height: auto;
-                position: relative;
+            }
+
+            .sidebar.active {
+                display: block;
             }
 
             .main-content {
-                margin-left: 0;
                 padding: 20px;
             }
 
             form {
                 padding: 20px;
+                max-width: 100%;
             }
 
             footer {
@@ -164,52 +187,59 @@
 </head>
 
 <body>
-    <!-- Sidebar -->
-    <div class="sidebar">
-        <h2>Admin Panel</h2>
-        <a href="{% url 'admin_dashboard' %}">Dashboard</a>
-        <a href="{% url 'add_agents' %}">Add Agents</a>
-        <a href="{% url 'manage_campaigns' %}">Add Campaigns</a>
-        <a href="{% url 'all_agents' %}">All Agents</a>
-        <a href="{% url 'all_campaigns' %}">View Campaigns</a>
-        <a href="{% url 'logout' %}">Logout</a>
-    </div>
+    <!-- Toggle Menu Button -->
+    <div class="menu-toggle" onclick="toggleMenu()">☰ Menu</div>
 
-    <!-- Main Content -->
-    <div class="main-content">
-        <h2>Edit Campaign</h2>
+    <!-- Container -->
+    <div class="container">
+        <!-- Sidebar -->
+        <div class="sidebar" id="sidebar">
+            <h2>Admin Panel</h2>
+            <a href="{% url 'admin_dashboard' %}">Dashboard</a>
+            <a href="{% url 'add_agents' %}">Add Agents</a>
+            <a href="{% url 'manage_campaigns' %}">Add Campaigns</a>
+            <a href="{% url 'all_agents' %}">All Agents</a>
+            <a href="{% url 'all_campaigns' %}">View Campaigns</a>
+            <a href="{% url 'logout' %}">Logout</a>
+        </div>
 
-        {% for message in messages %}
-        <div class="msg {{ message.tags }}">{{ message }}</div>
-        {% endfor %}
+        <!-- Main Content -->
+        <div class="main-content">
+            <h2>Edit Campaign</h2>
 
-        <form method="POST">
-            {% csrf_token %}
-            <label>Campaign Name:</label>
-            <input type="text" name="name" value="{{ campaign.name }}" required>
+            {% for message in messages %}
+            <div class="msg {{ message.tags }}">{{ message }}</div>
+            {% endfor %}
 
-            <label>Date:</label>
-            <input type="date" name="date" value="{{ campaign.date|date:'Y-m-d' }}" required>
+            <form method="POST">
+                {% csrf_token %}
+                <label>Campaign Name:</label>
+                <input type="text" name="name" value="{{ campaign.name }}" required>
 
-            <label>Location:</label>
-            <input type="text" name="location" id="location" value="{{ campaign.location }}" required>
+                <label>Date:</label>
+                <input type="date" name="date" value="{{ campaign.date|date:'Y-m-d' }}" required>
 
-            <input type="hidden" name="latitude" id="latitude" value="{{ campaign.latitude }}">
-            <input type="hidden" name="longitude" id="longitude" value="{{ campaign.longitude }}">
+                <label>Location:</label>
+                <input type="text" name="location" id="location" value="{{ campaign.location }}" required>
 
-            <div id="map"></div>
+                <input type="hidden" name="latitude" id="latitude" value="{{ campaign.latitude }}">
+                <input type="hidden" name="longitude" id="longitude" value="{{ campaign.longitude }}">
+                <label>Assign Agent:</label>
+                <select name="agent" required>
+                    {% for agent in agents %}
+                    <option value="{{ agent.id }}" {% if agent.id == campaign.agent.id %}selected{% endif %}>
+                        {{ agent.user.get_full_name }}
+                    </option>
+                    {% endfor %}
+                </select>
 
-            <label>Assign Agent:</label>
-            <select name="agent" required>
-                {% for agent in agents %}
-                <option value="{{ agent.id }}" {% if agent.id == campaign.agent.id %}selected{% endif %}>
-                    {{ agent.user.get_full_name }}
-                </option>
-                {% endfor %}
-            </select>
+                <div id="map"></div>
 
-            <button type="submit">Update Campaign</button>
-        </form>
+                
+
+                <button type="submit">Update Campaign</button>
+            </form>
+        </div>
     </div>
 
     <!-- Footer -->
@@ -217,9 +247,14 @@
         &copy; 2025 Insurance CRM. All rights reserved.
     </footer>
 
-    <!-- Leaflet Map Script -->
+    <!-- JS Scripts -->
     <script src="https://unpkg.com/leaflet/dist/leaflet.js"></script>
     <script>
+        function toggleMenu() {
+            const sidebar = document.getElementById('sidebar');
+            sidebar.classList.toggle('active');
+        }
+
         let map = L.map('map').setView([{{ campaign.latitude }}, {{ campaign.longitude }}], 13);
         L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
             maxZoom: 19,

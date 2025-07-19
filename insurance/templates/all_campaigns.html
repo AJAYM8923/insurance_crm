@@ -7,28 +7,60 @@
     <title>All Campaigns</title>
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <style>
-        /* Global Reset */
         * {
             margin: 0;
             padding: 0;
             box-sizing: border-box;
         }
 
+        html,
         body {
-            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
-            display: flex;
-            min-height: 100vh;
-            background-color: #f4f7fa;
+            height: 100%;
         }
 
-        /* Sidebar */
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            min-height: 100vh;
+            background-color: #f4f7fa;
+            display: flex;
+            flex-direction: column;
+        }
+
+        .container {
+            display: flex;
+            flex: 1;
+        }
+
+        /* Navbar toggle area for mobile */
+        .mobile-navbar {
+            display: none;
+            background-color: #2a3f54;
+            color: white;
+            text-align: center;
+            padding: 15px 0;
+        }
+
+        .toggle-btn {
+            font-size: 24px;
+            background: none;
+            color: white;
+            border: none;
+            cursor: pointer;
+        }
+
+        .toggle-btn span {
+            font-weight: bold;
+            font-size: 18px;
+            margin-left: 6px;
+            vertical-align: middle;
+        }
+
         .sidebar {
             width: 220px;
             background-color: #2a3f54;
             color: #fff;
-            position: fixed;
-            height: 100vh;
             padding: 20px;
+            transition: all 0.3s ease;
         }
 
         .sidebar h2 {
@@ -59,11 +91,9 @@
             background-color: #1a2732;
         }
 
-        /* Main Content */
         .main-content {
-            margin-left: 220px;
-            padding: 30px;
             flex: 1;
+            padding: 40px 20px 60px;
         }
 
         h3 {
@@ -73,11 +103,17 @@
             color: #003366;
         }
 
+        .table-container {
+            overflow-x: auto;
+            background: #fff;
+            border-radius: 8px;
+            box-shadow: 0 0 8px rgba(0, 0, 0, 0.05);
+        }
+
         table {
             width: 100%;
             border-collapse: collapse;
-            background: #fff;
-            box-shadow: 0 0 8px rgba(0, 0, 0, 0.05);
+            min-width: 750px;
         }
 
         th,
@@ -87,8 +123,7 @@
             text-align: center;
         }
 
-        thead tr,
-        table tr:first-child {
+        thead tr {
             background-color: #003366;
             color: white;
         }
@@ -106,37 +141,47 @@
             text-decoration: underline;
         }
 
-        /* Footer */
         footer {
             background-color: #2a3f54;
             color: #fff;
             text-align: center;
             padding: 12px;
-            position: fixed;
-            bottom: 0;
-            width: 100%;
-            left: 0;
         }
 
+        /* Mobile View */
         @media (max-width: 768px) {
+            .mobile-navbar {
+                display: block;
+            }
+
+            .container {
+                flex-direction: column;
+            }
+
             .sidebar {
                 width: 100%;
-                height: auto;
+                display: none;
                 position: relative;
+                padding: 15px 20px;
+            }
+
+            .sidebar.active {
+                display: block;
             }
 
             .main-content {
+                padding: 20px 15px 60px;
                 margin-left: 0;
-                padding: 20px;
             }
 
-            table,
-            thead,
-            tbody,
+            .main-content h3 {
+                font-size: 20px;
+            }
+
             th,
-            td,
-            tr {
+            td {
                 font-size: 14px;
+                padding: 10px;
             }
 
             footer {
@@ -147,58 +192,81 @@
 </head>
 
 <body>
-    <!-- Sidebar -->
-    <div class="sidebar">
-        <h2>Admin Panel</h2>
-        <ul>
-            <li><a href="{% url 'admin_dashboard' %}">Dashboard</a></li>
-            <li><a href="{% url 'add_agents' %}">Add Agents</a></li>
-            <li><a href="{% url 'manage_campaigns' %}">Add Campaigns</a></li>
-            <li><a href="{% url 'all_agents' %}">All Agents</a></li>
-            <li><a href="{% url 'all_campaigns' %}">View Campaigns</a></li>
-            <li><a href="{% url 'logout' %}">Logout</a></li>
-        </ul>
+
+    <!-- Mobile Navbar -->
+    <div class="mobile-navbar">
+        <button class="toggle-btn" onclick="toggleSidebar()">☰<span>Menu</span></button>
     </div>
 
-    <!-- Main Content -->
-    <div class="main-content">
-        <h3>All Campaigns</h3>
-        <table>
-            <tr>
-                <th>Name</th>
-                <th>Date</th>
-                <th>Location</th>
-                <th>Agent</th>
-                <th>Latitude</th>
-                <th>Longitude</th>
-                <th>Actions</th>
-            </tr>
-            {% for campaign in campaigns %}
-            <tr>
-                <td>{{ campaign.name }}</td>
-                <td>{{ campaign.date }}</td>
-                <td>{{ campaign.location }}</td>
-                <td>{{ campaign.agent.user.get_full_name }}</td>
-                <td>{{ campaign.latitude }}</td>
-                <td>{{ campaign.longitude }}</td>
-                <td>
-                    <a href="{% url 'edit_campaign' campaign.id %}">Edit</a> |
-                    <a href="{% url 'delete_campaign' campaign.id %}"
-                        onclick="return confirm('Are you sure?')">Delete</a>
-                </td>
-            </tr>
-            {% empty %}
-            <tr>
-                <td colspan="7">No campaigns found.</td>
-            </tr>
-            {% endfor %}
-        </table>
+    <!-- Page Container with Sidebar and Content -->
+    <div class="container">
+        <!-- Sidebar -->
+        <div class="sidebar" id="sidebar">
+            <h2>Admin Panel</h2>
+            <ul>
+                <li><a href="{% url 'admin_dashboard' %}">Dashboard</a></li>
+                <li><a href="{% url 'add_agents' %}">Add Agents</a></li>
+                <li><a href="{% url 'manage_campaigns' %}">Add Campaigns</a></li>
+                <li><a href="{% url 'all_agents' %}">All Agents</a></li>
+                <li><a href="{% url 'all_campaigns' %}">View Campaigns</a></li>
+                <li><a href="{% url 'logout' %}">Logout</a></li>
+            </ul>
+        </div>
+
+        <!-- Main Content -->
+        <div class="main-content">
+            <h3>All Campaigns</h3>
+            <div class="table-container">
+                <table>
+                    <thead>
+                        <tr>
+                            <th>Name</th>
+                            <th>Date</th>
+                            <th>Location</th>
+                            <th>Agent</th>
+                            <th>Latitude</th>
+                            <th>Longitude</th>
+                            <th>Actions</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        {% for campaign in campaigns %}
+                        <tr>
+                            <td>{{ campaign.name }}</td>
+                            <td>{{ campaign.date }}</td>
+                            <td>{{ campaign.location }}</td>
+                            <td>{{ campaign.agent.user.get_full_name }}</td>
+                            <td>{{ campaign.latitude }}</td>
+                            <td>{{ campaign.longitude }}</td>
+                            <td>
+                                <a href="{% url 'edit_campaign' campaign.id %}">Edit</a> |
+                                <a href="{% url 'delete_campaign' campaign.id %}"
+                                    onclick="return confirm('Are you sure?')">Delete</a>
+                            </td>
+                        </tr>
+                        {% empty %}
+                        <tr>
+                            <td colspan="7">No campaigns found.</td>
+                        </tr>
+                        {% endfor %}
+                    </tbody>
+                </table>
+            </div>
+        </div>
     </div>
 
     <!-- Footer -->
     <footer>
         &copy; 2025 Insurance CRM. All rights reserved.
     </footer>
+
+    <!-- Toggle Script -->
+    <script>
+        function toggleSidebar() {
+            document.getElementById("sidebar").classList.toggle("active");
+        }
+    </script>
+
 </body>
 
 </html>

@@ -42,6 +42,7 @@ urlpatterns = [
     path('agent/<int:agent_id>/clients/', views.agent_clients_detail, name='agent_clients_detail'),
     path('all_agents/', views.all_agents, name='all_agents'),
     path('all_campaigns/', views.all_campaigns, name='all_campaigns'),
+    path('account/', views.agent_account, name='agent_account'),
 
 ]
 if settings.DEBUG:

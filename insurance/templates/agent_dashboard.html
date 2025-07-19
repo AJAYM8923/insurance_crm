@@ -1,87 +1,273 @@
 <!DOCTYPE html>
-<html>
+<html lang="en">
 
 <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <title>Agent Dashboard</title>
     <style>
+        * {
+            box-sizing: border-box;
+        }
+
+        html,
+        body {
+            margin: 0;
+            padding: 0;
+            height: 100%;
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background-color: #f4f6f8;
+        }
+
+        .navbar {
+            background-color: #003366;
+            color: white;
+            padding: 15px 30px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            flex-wrap: wrap;
+            width: 100%;
+            position: fixed;
+            top: 0;
+            left: 0;
+            z-index: 10;
+        }
+
+        .brand {
+            font-weight: bold;
+            font-size: 1.1rem;
+        }
+
+        .nav-links {
+            display: flex;
+            gap: 20px;
+        }
+
+        .nav-links a {
+            color: #66ccff;
+            text-decoration: none;
+            font-weight: 500;
+        }
+
+        .nav-links a:hover {
+            text-decoration: underline;
+        }
+
+        .menu-toggle {
+            display: none;
+            font-size: 24px;
+            cursor: pointer;
+            color: white;
+        }
+
+        .container {
+            max-width: 800px;
+            width: 100%;
+            margin: 100px auto 30px;
+            background: white;
+            padding: 30px;
+            border-radius: 8px;
+            box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
+        }
+
+        h2 {
+            margin-bottom: 20px;
+            color: #003366;
+        }
+
+        form {
+            margin-bottom: 40px;
+        }
+
+        form label {
+            display: block;
+            margin-top: 10px;
+            font-weight: 500;
+        }
+
         input,
         select {
-            margin: 5px 0;
+            margin: 6px 0 16px;
             width: 100%;
-            padding: 8px;
+            padding: 10px;
+            border: 1px solid #ccc;
+            border-radius: 4px;
+        }
+
+        input[type="file"] {
+            padding: 5px;
+        }
+
+        button {
+            background-color: #003366;
+            color: white;
+            border: none;
+            padding: 10px 20px;
+            border-radius: 5px;
+            cursor: pointer;
+            font-weight: 500;
+        }
+
+        button:hover {
+            background-color: #002244;
         }
 
         .error {
             color: red;
+            font-size: 14px;
+            margin-top: -10px;
+            margin-bottom: 10px;
         }
 
         .success {
             color: green;
+            font-size: 14px;
+        }
+
+        .footer {
+            background-color: #003366;
+            color: white;
+            text-align: center;
+            padding: 15px;
+            width: 100%;
+        }
+
+        img.profile-pic {
+            width: 120px;
+            height: 120px;
+            object-fit: cover;
+            border: 2px solid #ccc;
+            border-radius: 6px;
+            margin-top: 10px;
+            margin-bottom: 10px;
+        }
+
+        #msg {
+            margin-bottom: 20px;
+            font-weight: bold;
+        }
+
+        @media (max-width: 768px) {
+            .menu-toggle {
+                display: block;
+            }
+
+            .nav-links {
+                display: none;
+                flex-direction: column;
+                width: 100%;
+                background-color: #002244;
+                position: absolute;
+                top: 60px;
+                left: 0;
+                padding: 10px 20px;
+            }
+
+            .nav-links a {
+                padding: 10px 0;
+            }
+
+            .nav-links.show {
+                display: flex;
+            }
+
+            .container {
+                margin: 160px auto 30px;
+                padding: 25px 20px;
+                width: calc(100% - 40px);
+            }
         }
     </style>
 </head>
 
 <body>
-    <h2>Edit Profile</h2>
-    <div id="msg"></div>
+    <div class="navbar">
+        <div class="brand">Insurance CRM</div>
+        <div class="menu-toggle" onclick="toggleMenu()">☰</div>
+        <div class="nav-links" id="navLinks">
+            <a href="{% url 'home' %}">Home</a>
+            <a href="{% url 'agent_account' %}">Account</a>
+        </div>
+    </div>
 
-    <form id="profileForm" enctype="multipart/form-data">
-        {% csrf_token %}
-        <label>First Name:</label>
-        <input type="text" name="first_name" value="{{ agent.user.first_name }}" required>
+    <div class="container" id="mainContent">
+        <h2>Edit Profile</h2>
+        <div id="msg"></div>
 
-        <label>Last Name:</label>
-        <input type="text" name="last_name" value="{{ agent.user.last_name }}" required>
+        <form id="profileForm" enctype="multipart/form-data">
+            {% csrf_token %}
+            <label>First Name:</label>
+            <input type="text" name="first_name" value="{{ agent.user.first_name }}" required>
 
-        <label>Email:</label>
-        <input type="email" name="email" value="{{ agent.user.email }}" required>
+            <label>Last Name:</label>
+            <input type="text" name="last_name" value="{{ agent.user.last_name }}" required>
 
-        <label>Phone:</label>
-        <input type="text" name="phone" value="{{ agent.phone }}" required>
+            <label>Email:</label>
+            <input type="email" name="email" value="{{ agent.user.email }}" required>
 
-        <label>Address:</label>
-        <input type="text" name="address" value="{{ agent.address }}" required>
+            <label>Phone:</label>
+            <input type="text" name="phone" value="{{ agent.phone }}" required>
 
-        <label>Gender:</label>
-        <select name="gender">
-            <option value="Male" {% if agent.gender == "Male" %}selected{% endif %}>Male</option>
-            <option value="Female" {% if agent.gender == "Female" %}selected{% endif %}>Female</option>
-            <option value="Other" {% if agent.gender == "Other" %}selected{% endif %}>Other</option>
-        </select>
+            <label>Address:</label>
+            <input type="text" name="address" value="{{ agent.address }}" required>
 
-        <label>Date of Birth:</label>
-        <input type="date" name="dob" value="{{ agent.dob|date:'Y-m-d' }}" required>
+            <label>Gender:</label>
+            <select name="gender">
+                <option value="Male" {% if agent.gender == "Male" %}selected{% endif %}>Male</option>
+                <option value="Female" {% if agent.gender == "Female" %}selected{% endif %}>Female</option>
+                <option value="Other" {% if agent.gender == "Other" %}selected{% endif %}>Other</option>
+            </select>
 
-        <label>Current Profile Picture:</label><br>
-{% if agent.profile_picture %}
-    <img src="{{ agent.profile_picture.url }}" alt="Profile Picture" style="width: 100px; height: 100px; object-fit: cover; border: 1px solid #ccc; border-radius: 5px;"><br><br>
-{% else %}
-    <p>No profile picture uploaded.</p>
-{% endif %}
+            <label>Date of Birth:</label>
+            <input type="date" name="dob" value="{{ agent.dob|date:'Y-m-d' }}" required>
 
-<label>Change Profile Picture:</label>
-<input type="file" name="profile_picture" accept="image/*">
+            <label>Current Profile Picture:</label>
+            {% if agent.profile_picture %}
+            <img src="{{ agent.profile_picture.url }}" alt="Profile Picture" class="profile-pic">
+            {% else %}
+            <p style="margin: 5px 0;">No profile picture uploaded.</p>
+            {% endif %}
 
+            <label>Change Profile Picture:</label>
+            <input type="file" name="profile_picture" accept="image/*">
 
-        <button type="submit">Update</button>
-    </form>
+            <button type="submit">Update</button>
+        </form>
 
-    <h2>Reset Password</h2>
-    <form id="passwordForm">
-        {% csrf_token %}
-        <label>Current Password:</label>
-        <input type="password" name="current_password" required>
+        <h2>Reset Password</h2>
+        <form id="passwordForm">
+            {% csrf_token %}
+            <label>Current Password:</label>
+            <input type="password" name="current_password" required>
 
-        <label>New Password:</label>
-        <input type="password" name="new_password" required>
+            <label>New Password:</label>
+            <input type="password" name="new_password" required>
 
-        <label>Confirm New Password:</label>
-        <input type="password" name="confirm_password" required>
+            <label>Confirm New Password:</label>
+            <input type="password" name="confirm_password" required>
 
-        <button type="submit">Reset Password</button>
-    </form>
+            <button type="submit">Reset Password</button>
+        </form>
+    </div>
 
-    <script>
+    <div class="footer">
+        &copy; 2025 Insurance CRM. All rights reserved.
+    </div>
+
+    <!-- ... rest of your code remains unchanged above ... -->
+
+<script>
+    function toggleMenu() {
+        const navLinks = document.getElementById("navLinks");
+        const container = document.getElementById("mainContent");
+        navLinks.classList.toggle("show");
+
+        if (window.innerWidth <= 768) {
+            container.style.marginTop = navLinks.classList.contains("show") ? "220px" : "160px";
+        }
+    }
+
     const profileForm = document.getElementById("profileForm");
     const phoneInput = document.querySelector('input[name="phone"]');
     const emailInput = document.querySelector('input[name="email"]');
@@ -90,10 +276,8 @@
     const phoneError = document.createElement("div");
     const emailError = document.createElement("div");
 
-    phoneError.style.color = "red";
-    phoneError.style.fontSize = "14px";
-    emailError.style.color = "red";
-    emailError.style.fontSize = "14px";
+    phoneError.className = "error";
+    emailError.className = "error";
 
     phoneInput.parentNode.insertBefore(phoneError, phoneInput.nextSibling);
     emailInput.parentNode.insertBefore(emailError, emailInput.nextSibling);
@@ -104,27 +288,16 @@
     }
 
     function validatePhone(phone) {
-        return /^\d{10}$/.test(phone); // exactly 10 digits
+        return /^\d{10}$/.test(phone);
     }
 
-    // Live phone validation
     phoneInput.addEventListener("input", function () {
-        this.value = this.value.replace(/\D/g, "").slice(0, 10); // allow only 10 digits
-
-        if (!validatePhone(this.value)) {
-            phoneError.innerText = "Phone must be exactly 10 digits.";
-        } else {
-            phoneError.innerText = "";
-        }
+        this.value = this.value.replace(/\D/g, "").slice(0, 10);
+        phoneError.innerText = validatePhone(this.value) ? "" : "Phone must be exactly 10 digits.";
     });
 
-    // Live email validation
     emailInput.addEventListener("input", function () {
-        if (!validateEmail(this.value.trim())) {
-            emailError.innerText = "Invalid email format (must end with .com or .in)";
-        } else {
-            emailError.innerText = "";
-        }
+        emailError.innerText = validateEmail(this.value.trim()) ? "" : "Invalid email format (.com or .in only)";
     });
 
     profileForm.addEventListener("submit", function (e) {
@@ -134,7 +307,6 @@
 
         const phone = phoneInput.value.trim();
         const email = emailInput.value.trim();
-
         let hasError = false;
 
         if (!validatePhone(phone)) {
@@ -143,13 +315,12 @@
         }
 
         if (!validateEmail(email)) {
-            emailError.innerText = "Invalid email format (must end with .com or .in)";
+            emailError.innerText = "Invalid email format (.com or .in only)";
             hasError = true;
         }
 
         if (hasError) return;
 
-        // Submit with fetch
         const formData = new FormData(profileForm);
         fetch("{% url 'agent_dashboard' %}", {
             method: "POST",
@@ -159,14 +330,61 @@
         .then(data => {
             msg.innerText = data.message;
             msg.className = data.status;
+
+            if (data.status === "success") {
+                // ✅ Force full reload after 1 second to reflect new profile picture
+                setTimeout(() => {
+                    location.reload();
+                }, 1000);
+            }
         });
     });
-</script>
-<script>
+
     const passwordForm = document.getElementById("passwordForm");
+    const newPassword = passwordForm.querySelector('input[name="new_password"]');
+    const confirmPassword = passwordForm.querySelector('input[name="confirm_password"]');
+
+    const newPasswordError = document.createElement("div");
+    const confirmPasswordError = document.createElement("div");
+
+    newPasswordError.className = "error";
+    confirmPasswordError.className = "error";
+
+    newPassword.parentNode.insertBefore(newPasswordError, newPassword.nextSibling);
+    confirmPassword.parentNode.insertBefore(confirmPasswordError, confirmPassword.nextSibling);
+
+    function hasSpecialChar(str) {
+        return /[!@#$%^&*()\-_=+\[{\]};:'",<.>/?\\|`~]/.test(str);
+    }
+
+    function checkPasswordMatch() {
+        confirmPasswordError.innerText = confirmPassword.value !== newPassword.value ? "Passwords do not match." : "";
+    }
+
+    newPassword.addEventListener("input", function () {
+        const value = this.value.trim();
+        let message = "";
+
+        if (value.length < 8) message = "At least 8 characters.";
+        else if (!/[a-zA-Z]/.test(value)) message = "Must include a letter.";
+        else if (!/\d/.test(value)) message = "Must include a number.";
+        else if (!hasSpecialChar(value)) message = "Must include a special character.";
+
+        newPasswordError.innerText = message;
+        checkPasswordMatch();
+    });
+
+    confirmPassword.addEventListener("input", checkPasswordMatch);
 
     passwordForm.addEventListener("submit", function (e) {
         e.preventDefault();
+        msg.innerText = "";
+        msg.className = "";
+
+        if (newPasswordError.innerText || confirmPasswordError.innerText) {
+            return;
+        }
+
         const formData = new FormData(passwordForm);
 
         fetch("{% url 'reset_agent_password' %}", {
@@ -178,18 +396,18 @@
         })
         .then(res => res.json())
         .then(data => {
-            const msgDiv = document.getElementById("msg");
-            msgDiv.innerText = data.message;
-            msgDiv.className = data.status;
+            msg.innerText = data.message;
+            msg.className = data.status;
 
             if (data.status === "success") {
                 setTimeout(() => {
-                    window.location.href = "{% url 'login' %}";  // Redirect to login page after logout
-                }, 2000);
+                    window.location.href = "{% url 'login' %}";
+                }, 1500);
             }
         });
     });
 </script>
+
 
 </body>
 

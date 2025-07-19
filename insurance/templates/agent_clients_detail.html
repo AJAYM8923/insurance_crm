@@ -7,7 +7,6 @@
     <title>Clients of {{ agent.user.get_full_name }}</title>
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <style>
-        /* Global Layout */
         * {
             margin: 0;
             padding: 0;
@@ -18,7 +17,25 @@
             font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
             display: flex;
             min-height: 100vh;
-            background-color: #f4f7fa;
+            background-color: #eef2f5;
+            flex-direction: column;
+        }
+
+        /* Mobile Toggle Button */
+        .mobile-toggle {
+            display: none;
+            width: 100%;
+            background-color: #2a3f54;
+            color: #fff;
+            text-align: center;
+            padding: 15px;
+            font-size: 18px;
+            font-weight: bold;
+            cursor: pointer;
+            position: fixed;
+            top: 0;
+            left: 0;
+            z-index: 1000;
         }
 
         /* Sidebar */
@@ -29,6 +46,8 @@
             position: fixed;
             height: 100vh;
             padding: 20px;
+            transition: max-height 0.3s ease-out;
+            overflow: hidden;
         }
 
         .sidebar h2 {
@@ -47,6 +66,8 @@
         }
 
         .sidebar ul li a {
+            font-size: 16px;
+            font-weight: 500;
             text-decoration: none;
             color: #fff;
             padding: 10px;
@@ -67,44 +88,63 @@
         }
 
         h2 {
-            font-size: 26px;
+            font-size: 28px;
             text-align: center;
             margin-bottom: 30px;
             color: #003366;
         }
 
-        table {
-            width: 100%;
-            border-collapse: collapse;
-            background: #fff;
-            box-shadow: 0 0 8px rgba(0, 0, 0, 0.05);
+        /* Client Card */
+        .client-card {
+            background-color: #ffffff;
+            border: 1px solid #ccd6dd;
+            border-radius: 10px;
+            padding: 25px;
+            margin-bottom: 30px;
+            box-shadow: 0 4px 10px rgba(0, 0, 0, 0.05);
+            transition: transform 0.2s;
         }
 
-        th,
-        td {
-            padding: 12px;
-            border: 1px solid #ddd;
-            text-align: left;
-            vertical-align: top;
+        .client-card:hover {
+            transform: translateY(-2px);
         }
 
-        thead tr {
-            background-color: #003366;
-            color: white;
+        .client-card h3 {
+            font-size: 20px;
+            margin-bottom: 20px;
+            color: #1a1a1a;
+            border-bottom: 1px solid #ddd;
+            padding-bottom: 10px;
         }
 
-        tbody tr:nth-child(even) {
-            background-color: #f9f9f9;
+        .client-details {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(260px, 1fr));
+            gap: 15px;
         }
 
-        a {
+        .client-details p {
+            font-size: 15px;
+            background: #f7f9fc;
+            padding: 10px 15px;
+            border-left: 4px solid #003366;
+            border-radius: 5px;
+            color: #333;
+        }
+
+        .client-details p strong {
+            color: #003366;
+        }
+
+        .back-link {
             color: #003366;
             text-decoration: none;
             display: inline-block;
             margin-top: 20px;
+            font-weight: bold;
         }
 
-        a:hover {
+        .back-link:hover {
             text-decoration: underline;
         }
 
@@ -120,43 +160,52 @@
             color: #fff;
             text-align: center;
             padding: 12px;
-            position: fixed;
+            position: relative;
             bottom: 0;
             width: 100%;
-            left: 0;
         }
 
+        /* Responsive Styles */
         @media (max-width: 768px) {
+            body {
+                flex-direction: column;
+            }
+
+            .mobile-toggle {
+                display: block;
+            }
+
             .sidebar {
                 width: 100%;
                 height: auto;
                 position: relative;
+                max-height: 0;
+                padding: 0;
+            }
+
+            .sidebar.active {
+                max-height: 1000px;
+                padding: 20px;
             }
 
             .main-content {
                 margin-left: 0;
-                padding: 20px;
+                padding: 100px 20px 20px 20px;
             }
 
-            table,
-            thead,
-            tbody,
-            th,
-            td,
-            tr {
-                font-size: 14px;
-            }
-
-            footer {
-                position: relative;
+            .client-details {
+                grid-template-columns: 1fr;
             }
         }
     </style>
 </head>
 
 <body>
+    <!-- Mobile Toggle Button -->
+    <div class="mobile-toggle" onclick="toggleMenu()">☰ Menu</div>
+
     <!-- Sidebar -->
-    <div class="sidebar">
+    <div class="sidebar" id="sidebar">
         <h2>Admin Panel</h2>
         <ul>
             <li><a href="{% url 'admin_dashboard' %}">Dashboard</a></li>
@@ -173,85 +222,58 @@
         <h2>Clients Assigned to {{ agent.user.get_full_name }}</h2>
 
         {% if clients %}
-        <table>
-            <thead>
-                <tr>
-                    <th>Name</th>
-                    <th>Phone</th>
-                    <th>Email</th>
-                    <th>Address</th>
-                    <th>Age</th>
-                    <th>DOB</th>
-                    <th>Qualification</th>
-                    <th>Profession</th>
-                    <th>Aadhar</th>
-                    <th>PAN</th>
-                    <th>Income</th>
-                    <th>Marital Status</th>
-                    <th>Kids</th>
-                    <th>Source</th>
-                    <th>Existing Profile</th>
-                    <th>Customer Service</th>
-                    <th>Claim Satisfaction</th>
-                    <th>Visited Policy</th>
-                    <th>Willing to Purchase</th>
-                    <th>Willing to Share Previous</th>
-                    <th>Previous Insurance Number</th>
-                    <th>Previous Insurance Name</th>
-                    <th>Previous Claimed</th>
-                    <th>Willingness to Switch</th>
-                    <th>Preferences</th>
-                    <th>Agent Note</th>
-                    <th>Campaign</th>
-                    <th>Created At</th>
-                </tr>
-            </thead>
-            <tbody>
-                {% for client in clients %}
-                <tr>
-                    <td>{{ client.name }}</td>
-                    <td>{{ client.phone }}</td>
-                    <td>{{ client.email }}</td>
-                    <td>{{ client.address }}</td>
-                    <td>{{ client.age }}</td>
-                    <td>{{ client.dob }}</td>
-                    <td>{{ client.qualification }}</td>
-                    <td>{{ client.profession }}</td>
-                    <td>{{ client.aadhar }}</td>
-                    <td>{{ client.pan }}</td>
-                    <td>{{ client.income }}</td>
-                    <td>{{ client.marital_status }}</td>
-                    <td>{{ client.have_kids }}</td>
-                    <td>{{ client.know_about_us }}</td>
-                    <td>{{ client.existing_profile }}</td>
-                    <td>{{ client.customer_service }}</td>
-                    <td>{{ client.claim_satisfaction }}</td>
-                    <td>{{ client.visited_policy }}</td>
-                    <td>{{ client.willingness_to_purchase }}</td>
-                    <td>{{ client.willingness_to_share_prev }}</td>
-                    <td>{{ client.prev_insurance_number }}</td>
-                    <td>{{ client.prev_insurance_name }}</td>
-                    <td>{{ client.prev_insurance_claimed }}</td>
-                    <td>{{ client.willingness_to_switch }}</td>
-                    <td>{{ client.preferences }}</td>
-                    <td>{{ client.agent_note }}</td>
-                    <td>{{ client.campaign.name }}</td>
-                    <td>{{ client.created_at }}</td>
-                </tr>
-                {% endfor %}
-            </tbody>
-        </table>
+        {% for client in clients %}
+        <div class="client-card">
+            <h3>{{ client.name }}</h3>
+            <div class="client-details">
+                <p><strong>Phone:</strong> {{ client.phone }}</p>
+                <p><strong>Email:</strong> {{ client.email }}</p>
+                <p><strong>Address:</strong> {{ client.address }}</p>
+                <p><strong>Age:</strong> {{ client.age }}</p>
+                <p><strong>DOB:</strong> {{ client.dob }}</p>
+                <p><strong>Qualification:</strong> {{ client.qualification }}</p>
+                <p><strong>Profession:</strong> {{ client.profession }}</p>
+                <p><strong>Aadhar:</strong> {{ client.aadhar }}</p>
+                <p><strong>PAN:</strong> {{ client.pan }}</p>
+                <p><strong>Income:</strong> {{ client.income }}</p>
+                <p><strong>Marital Status:</strong> {{ client.marital_status }}</p>
+                <p><strong>Kids:</strong> {{ client.have_kids }}</p>
+                <p><strong>Source:</strong> {{ client.know_about_us }}</p>
+                <p><strong>Existing Profile:</strong> {{ client.existing_profile }}</p>
+                <p><strong>Customer Service:</strong> {{ client.customer_service }}</p>
+                <p><strong>Claim Satisfaction:</strong> {{ client.claim_satisfaction }}</p>
+                <p><strong>Visited Policy:</strong> {{ client.visited_policy }}</p>
+                <p><strong>Willing to Purchase:</strong> {{ client.willingness_to_purchase }}</p>
+                <p><strong>Willing to Share Previous:</strong> {{ client.willingness_to_share_prev }}</p>
+                <p><strong>Previous Insurance Number:</strong> {{ client.prev_insurance_number }}</p>
+                <p><strong>Previous Insurance Name:</strong> {{ client.prev_insurance_name }}</p>
+                <p><strong>Previous Claimed:</strong> {{ client.prev_insurance_claimed }}</p>
+                <p><strong>Willingness to Switch:</strong> {{ client.willingness_to_switch }}</p>
+                <p><strong>Preferences:</strong> {{ client.preferences }}</p>
+                <p><strong>Agent Note:</strong> {{ client.agent_note }}</p>
+                <p><strong>Campaign:</strong> {{ client.campaign.name }}</p>
+                <p><strong>Created At:</strong> {{ client.created_at }}</p>
+            </div>
+        </div>
+        {% endfor %}
         {% else %}
         <p>No clients found for this agent.</p>
         {% endif %}
 
-        <a href="{% url 'add_agents' %}">← Back to Agents</a>
+
     </div>
 
     <!-- Footer -->
     <footer>
         &copy; 2025 Insurance CRM. All rights reserved.
     </footer>
+
+    <!-- Toggle Script -->
+    <script>
+        function toggleMenu() {
+            document.getElementById('sidebar').classList.toggle('active');
+        }
+    </script>
 </body>
 
 </html>

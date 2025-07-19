@@ -14,11 +14,22 @@
             box-sizing: border-box;
         }
 
+        html,
         body {
-            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            height: 100%;
+        }
+
+        body {
             display: flex;
+            flex-direction: column;
             min-height: 100vh;
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
             background-color: #f4f7fa;
+        }
+
+        .main-wrapper {
+            display: flex;
+            flex: 1;
         }
 
         /* Sidebar */
@@ -26,9 +37,8 @@
             width: 220px;
             background-color: #2a3f54;
             color: #fff;
-            position: fixed;
-            height: 100vh;
             padding: 20px;
+            transition: all 0.3s ease;
         }
 
         .sidebar h2 {
@@ -59,11 +69,20 @@
             background-color: #1a2732;
         }
 
-        /* Main Content */
+        /* Toggle Button */
+        .menu-toggle {
+            display: none;
+            background-color: #2a3f54;
+            color: #fff;
+            padding: 10px 20px;
+            text-align: center;
+            cursor: pointer;
+            font-size: 18px;
+        }
+
         .main-content {
-            margin-left: 220px;
-            padding: 30px;
             flex: 1;
+            padding: 30px;
         }
 
         h2 {
@@ -73,11 +92,16 @@
             color: #003366;
         }
 
+        .table-container {
+            overflow-x: auto;
+        }
+
         table {
             width: 100%;
             border-collapse: collapse;
             background: #fff;
             box-shadow: 0 0 8px rgba(0, 0, 0, 0.05);
+            min-width: 800px;
         }
 
         th,
@@ -118,22 +142,32 @@
             color: #fff;
             text-align: center;
             padding: 12px;
-            position: fixed;
-            bottom: 0;
+            position: relative;
             width: 100%;
-            left: 0;
         }
 
+        /* Mobile Responsive */
         @media (max-width: 768px) {
             .sidebar {
                 width: 100%;
                 height: auto;
                 position: relative;
+                display: none;
+            }
+
+            .main-wrapper {
+                flex-direction: column;
             }
 
             .main-content {
                 margin-left: 0;
                 padding: 20px;
+            }
+
+            .menu-toggle {
+                display: block;
+                position: relative;
+                z-index: 999;
             }
 
             table,
@@ -153,77 +187,90 @@
 </head>
 
 <body>
-    <!-- Sidebar -->
-    <div class="sidebar">
-        <h2>Admin Panel</h2>
-        <ul>
-            <li><a href="{% url 'admin_dashboard' %}">Dashboard</a></li>
-            <li><a href="{% url 'add_agents' %}">Add Agents</a></li>
-            <li><a href="{% url 'manage_campaigns' %}">Add Campaigns</a></li>
-            <li><a href="{% url 'all_agents' %}">All Agents</a></li>
-            <li><a href="{% url 'all_campaigns' %}">View Campaigns</a></li>
-            <li><a href="{% url 'logout' %}">Logout</a></li>
-        </ul>
-    </div>
+    <!-- Toggle Button for Mobile -->
+    <div class="menu-toggle" onclick="toggleMenu()">☰ Menu</div>
 
-    <!-- Main Content -->
-    <div class="main-content">
-        <h2>All Agents</h2>
+    <!-- Main Wrapper -->
+    <div class="main-wrapper">
+        <!-- Sidebar -->
+        <div class="sidebar" id="sidebarMenu">
+            <h2>Admin Panel</h2>
+            <ul>
+                <li><a href="{% url 'admin_dashboard' %}">Dashboard</a></li>
+                <li><a href="{% url 'add_agents' %}">Add Agents</a></li>
+                <li><a href="{% url 'manage_campaigns' %}">Add Campaigns</a></li>
+                <li><a href="{% url 'all_agents' %}">All Agents</a></li>
+                <li><a href="{% url 'all_campaigns' %}">View Campaigns</a></li>
+                <li><a href="{% url 'logout' %}">Logout</a></li>
+            </ul>
+        </div>
 
-        <table>
-            <thead>
-                <tr>
-
-                    <th>Profile Picture</th>
-                    <th>Full Name</th>
-                    <th>Email</th>
-                    <th>Phone</th>
-                    <th>Address</th>
-                    <th>Gender</th>
-                    <th>DOB</th>
-                    <th>Actions</th>
-                </tr>
-            </thead>
-            <tbody>
-                {% for agent in agents %}
-                <tr>
-
-                    <td>
-                        {% if agent.profile_picture %}
-                        <img src="{{ agent.profile_picture.url }}" alt="Profile">
-                        {% else %}
-                        No Image
-                        {% endif %}
-                    </td>
-                    <td>
-                        <a href="{% url 'agent_clients_detail' agent.id %}">
-                            {{ agent.user.first_name }} {{ agent.user.last_name }}
-                        </a>
-                    </td>
-                    <td>{{ agent.user.email }}</td>
-                    <td>{{ agent.phone }}</td>
-                    <td>{{ agent.address }}</td>
-                    <td>{{ agent.gender }}</td>
-                    <td>{{ agent.dob }}</td>
-                    <td>
-                        <a href="{% url 'edit_agent' agent.id %}">Edit</a> |
-                        <a href="{% url 'delete_agent' agent.id %}"
-                            onclick="return confirm('Are you sure to delete?')">Delete</a>
-                    </td>
-                </tr>
-                {% empty %}
-                <tr>
-                    <td colspan="9">No agents found.</td>
-                </tr>
-                {% endfor %}
-            </tbody>
-        </table>
+        <!-- Main Content -->
+        <div class="main-content">
+            <h2>All Agents</h2>
+            <div class="table-container">
+                <table>
+                    <thead>
+                        <tr>
+                            <th>Profile Picture</th>
+                            <th>Full Name</th>
+                            <th>Email</th>
+                            <th>Phone</th>
+                            <th>Address</th>
+                            <th>Gender</th>
+                            <th>DOB</th>
+                            <th>Actions</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        {% for agent in agents %}
+                        <tr>
+                            <td>
+                                {% if agent.profile_picture %}
+                                <img src="{{ agent.profile_picture.url }}" alt="Profile">
+                                {% else %}
+                                No Image
+                                {% endif %}
+                            </td>
+                            <td>
+                                <a href="{% url 'agent_clients_detail' agent.id %}">
+                                    {{ agent.user.first_name }} {{ agent.user.last_name }}
+                                </a>
+                            </td>
+                            <td>{{ agent.user.email }}</td>
+                            <td>{{ agent.phone }}</td>
+                            <td>{{ agent.address }}</td>
+                            <td>{{ agent.gender }}</td>
+                            <td>{{ agent.dob }}</td>
+                            <td>
+                                <a href="{% url 'edit_agent' agent.id %}">Edit</a> |
+                                <a href="{% url 'delete_agent' agent.id %}"
+                                    onclick="return confirm('Are you sure to delete?')">Delete</a>
+                            </td>
+                        </tr>
+                        {% empty %}
+                        <tr>
+                            <td colspan="8">No agents found.</td>
+                        </tr>
+                        {% endfor %}
+                    </tbody>
+                </table>
+            </div>
+        </div>
     </div>
 
     <!-- Footer -->
     <footer>
         &copy; 2025 Insurance CRM. All rights reserved.
     </footer>
+
+    <!-- JS for toggle -->
+    <script>
+        function toggleMenu() {
+            const sidebar = document.getElementById('sidebarMenu');
+            sidebar.style.display = sidebar.style.display === 'block' ? 'none' : 'block';
+        }
+    </script>
 </body>
 
 </html>

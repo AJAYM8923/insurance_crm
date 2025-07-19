@@ -1,48 +1,226 @@
 <!DOCTYPE html>
-<html>
+<html lang="en">
 
 <head>
-    <title>Manage Clients</title>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Manage Clients - Insurance CRM</title>
     <style>
+        * {
+            box-sizing: border-box;
+        }
+
+        html,
+        body {
+            margin: 0;
+            padding: 0;
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background-color: #f4f6f8;
+        }
+
+        .navbar {
+            background-color: #003366;
+            color: white;
+            padding: 15px 30px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            flex-wrap: wrap;
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            z-index: 10;
+        }
+
+        .brand {
+            font-weight: bold;
+            font-size: 1.2rem;
+        }
+
+        .nav-links {
+            display: flex;
+            gap: 20px;
+        }
+
+        .nav-links a {
+            color: #66ccff;
+            text-decoration: none;
+            font-weight: 500;
+        }
+
+        .nav-links a:hover {
+            text-decoration: underline;
+        }
+
+        .menu-toggle {
+            display: none;
+            font-size: 24px;
+            cursor: pointer;
+            color: white;
+        }
+
+        .container {
+            max-width: 800px;
+            width: 100%;
+            margin: 100px auto 30px;
+            background: white;
+            padding: 30px;
+            border-radius: 8px;
+            box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
+        }
+
+        h2 {
+            margin-bottom: 20px;
+            color: #003366;
+            text-align: center;
+        }
+
+        form label {
+            display: block;
+            margin-top: 10px;
+            font-weight: 500;
+        }
+
+        input,
+        select,
+        textarea {
+            width: 100% !important;
+            padding: 10px;
+            margin-top: 6px;
+            margin-bottom: 16px;
+            border: 1px solid #ccc;
+            border-radius: 4px;
+            font-size: 1rem;
+        }
+
+        input[readonly] {
+            background-color: #e9ecef;
+        }
+
+        button {
+            background-color: #003366;
+            color: white;
+            border: none;
+            padding: 10px 20px;
+            border-radius: 5px;
+            cursor: pointer;
+            font-weight: 500;
+        }
+
+        button:hover {
+            background-color: #002244;
+        }
+
         .error {
             color: red;
             font-size: 14px;
+            margin-top: -10px;
+            margin-bottom: 10px;
         }
 
-        input:invalid {
-            border-color: red;
+        .footer {
+            background-color: #003366;
+            color: white;
+            text-align: center;
+            padding: 15px;
+            width: 100%;
         }
 
-        input:valid {
-            border-color: green;
+        @media (max-width: 768px) {
+            .menu-toggle {
+                display: block;
+            }
+
+            .nav-links {
+                display: none;
+                flex-direction: column;
+                width: 100%;
+                background-color: #002244;
+                position: absolute;
+                top: 60px;
+                left: 0;
+                padding: 10px 20px;
+            }
+
+            .nav-links a {
+                padding: 10px 0;
+            }
+
+            .nav-links.show {
+                display: flex;
+            }
+
+            .container {
+                margin: 160px auto 30px;
+                padding: 25px 20px;
+                width: calc(100% - 40px);
+            }
         }
     </style>
 </head>
 
 <body>
-    <h2>Add Client</h2>
-    <form method="POST" id="clientForm">
-        {% csrf_token %}
-        {% for field in form %}
-        <div>
-            {{ field.label_tag }}
-            {{ field }}
-            <div class="error" id="{{ field.name }}_error"></div>
+
+    <!-- Navbar -->
+    <div class="navbar">
+        <div class="brand">InsuranceCRM</div>
+        <div class="menu-toggle" onclick="toggleMenu()">☰</div>
+        <div class="nav-links" id="navLinks">
+            {% if user.is_authenticated and not user.is_superuser %}
+            <a href="{% url 'home' %}">Home</a>
+            <a href="{% url 'agent_campaigns' %}">My Campaigns</a>
+            <a href="{% url 'view_clients' %}">View Clients</a>
+            {% endif %}
         </div>
-        {% endfor %}
-        <button type="submit">Submit</button>
-    </form>
+    </div>
 
+    <!-- Main Form -->
+    <div class="container" id="mainContent">
+        <h2>Add Client</h2>
+        <form method="POST" id="clientForm">
+            {% csrf_token %}
+            {% for field in form %}
+            <label for="{{ field.id_for_label }}">{{ field.label }}</label>
+            {{ field.as_widget }}
+            <div class="error" id="{{ field.name }}_error"></div>
+            {% endfor %}
+            <button type="submit">Submit</button>
+        </form>
+
+    </div>
+
+    <!-- Footer -->
+    <div class="footer">
+        &copy; 2025 InsuranceCRM. All rights reserved.
+    </div>
+
+    <!-- JavaScript -->
     <script>
-        const form = document.getElementById("clientForm");
+        function toggleMenu() {
+            const navLinks = document.getElementById("navLinks");
+            const container = document.getElementById("mainContent");
+            navLinks.classList.toggle("show");
 
+            if (window.innerWidth <= 768) {
+                container.style.marginTop = navLinks.classList.contains("show") ? "220px" : "160px";
+            }
+        }
+
+        const form = document.getElementById("clientForm");
         const phoneInput = document.getElementById("id_phone");
         const emailInput = document.getElementById("id_email");
         const aadharInput = document.getElementById("id_aadhar");
         const panInput = document.getElementById("id_pan");
+        const dobInput = document.getElementById("id_dob");
+        const ageInput = document.getElementById("id_age");
+
+        if (ageInput) {
+            ageInput.setAttribute("readonly", true);
+        }
 
         function validatePhone() {
-            const val = phoneInput.value.trim();
+            const val = phoneInput?.value.trim();
             const error = document.getElementById("phone_error");
             if (!/^\d{10}$/.test(val)) {
                 error.textContent = "Phone must be exactly 10 digits";
@@ -53,7 +231,7 @@
         }
 
         function validateEmail() {
-            const val = emailInput.value.trim();
+            const val = emailInput?.value.trim();
             const error = document.getElementById("email_error");
             if (!/^[^@]+@[^@]+\.(com|in)$/.test(val)) {
                 error.textContent = "Enter a valid .com or .in email";
@@ -64,10 +242,10 @@
         }
 
         function validateAadhar() {
-            const val = aadharInput.value.trim();
+            const val = aadharInput?.value.trim();
             const error = document.getElementById("aadhar_error");
-            if (!/^\d{14}$/.test(val)) {
-                error.textContent = "Aadhar must be exactly 14 digits";
+            if (!/^\d{12}$/.test(val)) {
+                error.textContent = "Aadhar must be exactly 12 digits";
                 return false;
             }
             error.textContent = "";
@@ -75,34 +253,72 @@
         }
 
         function validatePAN() {
-            const val = panInput.value.trim();
+            const val = panInput?.value.trim().toUpperCase();
             const error = document.getElementById("pan_error");
-            if (!/^\d{14}$/.test(val)) {
-                error.textContent = "PAN must be exactly 14 digits";
+            const panRegex = /^[A-Z]{5}[0-9]{4}[A-Z]$/;
+            if (!panRegex.test(val)) {
+                error.textContent = "Format: 5 letters, 4 digits, 1 letter (ABCDE1234F)";
                 return false;
             }
             error.textContent = "";
             return true;
         }
 
-        // Attach input events
-        phoneInput.addEventListener("input", validatePhone);
-        emailInput.addEventListener("input", validateEmail);
-        aadharInput.addEventListener("input", validateAadhar);
-        panInput.addEventListener("input", validatePAN);
+        function calculateAge() {
+            const val = dobInput?.value;
+            const error = document.getElementById("dob_error");
 
-        // Prevent form submission if any field is invalid
-        form.addEventListener("submit", function (e) {
-            const isPhoneValid = validatePhone();
-            const isEmailValid = validateEmail();
-            const isAadharValid = validateAadhar();
-            const isPanValid = validatePAN();
-
-            if (!(isPhoneValid && isEmailValid && isAadharValid && isPanValid)) {
-                e.preventDefault();
+            if (!val) {
+                error.textContent = "Date of Birth is required.";
+                ageInput.value = "";
+                return false;
             }
+
+            const dob = new Date(val);
+            const today = new Date();
+
+            if (dob > today) {
+                error.textContent = "DOB cannot be in the future.";
+                ageInput.value = "";
+                return false;
+            }
+
+            let age = today.getFullYear() - dob.getFullYear();
+            const m = today.getMonth() - dob.getMonth();
+            if (m < 0 || (m === 0 && today.getDate() < dob.getDate())) {
+                age--;
+            }
+
+            if (age <= 0) {
+                error.textContent = "Age must be greater than 0.";
+                ageInput.value = "";
+                return false;
+            }
+
+            error.textContent = "";
+            ageInput.value = age;
+            return true;
+        }
+
+        phoneInput?.addEventListener("input", validatePhone);
+        emailInput?.addEventListener("input", validateEmail);
+        aadharInput?.addEventListener("input", validateAadhar);
+        panInput?.addEventListener("input", validatePAN);
+        dobInput?.addEventListener("change", calculateAge);
+        dobInput?.addEventListener("blur", calculateAge);
+
+        form?.addEventListener("submit", function (e) {
+            const valid =
+                validatePhone() &&
+                validateEmail() &&
+                validateAadhar() &&
+                validatePAN() &&
+                calculateAge();
+
+            if (!valid) e.preventDefault();
         });
     </script>
+
 </body>
 
 </html>

@@ -40,7 +40,9 @@ def login_view(request):
     return render(request, "login.html")
 @user_passes_test(lambda u: u.is_superuser)
 def admin_dashboard(request):
-    return render(request, "admin_dashboard.html")
+    return render(request, "admin_dashboard.html", {
+        'admin_user': request.user
+    })
 @user_passes_test(lambda u: u.is_superuser)
 def add_agents(request):
     if not request.user.is_superuser:
@@ -144,7 +146,7 @@ def edit_agent(request, agent_id):
             agent.save()
 
             messages.success(request, "Agent details updated successfully.")
-            return redirect('add_agents')
+            return redirect('all_agents')
 
     return render(request, 'edit_agent.html', {'agent': agent})
 @user_passes_test(lambda u: u.is_superuser)
@@ -152,7 +154,7 @@ def delete_agent(request, agent_id):
     agent = get_object_or_404(Agent, id=agent_id)
     agent.user.delete()  # This will also delete Agent due to OneToOne
     messages.success(request, "Agent deleted successfully.")
-    return redirect('add_agents')
+    return redirect('all_agents')
 
 @user_passes_test(lambda u: u.is_superuser)
 def manage_campaigns(request):
@@ -191,7 +193,7 @@ def manage_campaigns(request):
 def delete_campaign(request, campaign_id):
     Campaign.objects.get(id=campaign_id).delete()
     messages.success(request, "Campaign deleted.")
-    return redirect('manage_campaigns')
+    return redirect('all_campaigns')
 
 
 @user_passes_test(lambda u: u.is_superuser)
@@ -219,7 +221,7 @@ def edit_campaign(request, campaign_id):
             campaign.save()
 
             messages.success(request, "Campaign updated successfully.")
-            return redirect('manage_campaigns')
+            return redirect('all_campaigns')
 
     return render(request, 'edit_campaign.html', {
         'campaign': campaign,
@@ -273,6 +275,11 @@ def agent_dashboard(request):
         return JsonResponse({'status': 'success', 'message': 'Profile updated successfully.'})
 
     return render(request, 'agent_dashboard.html', {'agent': agent})
+from django.contrib.auth.decorators import login_required
+from django.contrib.auth import logout
+from django.contrib.auth.hashers import check_password
+from django.http import JsonResponse
+
 @login_required
 def reset_agent_password(request):
     if request.method == 'POST':
@@ -286,14 +293,23 @@ def reset_agent_password(request):
         if new_pwd != confirm_pwd:
             return JsonResponse({'status': 'error', 'message': 'Passwords do not match.'})
 
-        if len(new_pwd) < 8 or not any(c.isalpha() for c in new_pwd) or not any(c.isdigit() for c in new_pwd) or not any(c in "!@#$%^&*()_+" for c in new_pwd):
-            return JsonResponse({'status': 'error', 'message': 'Password must be at least 8 characters long and contain letters, numbers, and special characters.'})
+        # Strong password check: 8+ chars, letter, number, special char
+        if (
+            len(new_pwd) < 8 or
+            not any(c.isalpha() for c in new_pwd) or
+            not any(c.isdigit() for c in new_pwd) or
+            not any(c in "!@#$%^&*()-_=+[{]};:'\",<.>/?\\|`~" for c in new_pwd)
+        ):
+            return JsonResponse({
+                'status': 'error',
+                'message': 'Password must be at least 8 characters long and contain at least one letter, one number, and one special character.'
+            })
 
         user = request.user
         user.set_password(new_pwd)
         user.save()
 
-        logout(request)  # Logout user
+        logout(request)  # log the user out
         return JsonResponse({'status': 'success', 'message': 'Password reset successfully. Please log in again.'})
 
     return JsonResponse({'status': 'error', 'message': 'Invalid request'})
@@ -371,3 +387,12 @@ def all_agents(request):
 def all_campaigns(request):
     campaigns = Campaign.objects.all().order_by('-date')
     return render(request, 'all_campaigns.html', {'campaigns': campaigns})
+
+
+@login_required
+def agent_account(request):
+    if request.user.is_superuser:
+        return redirect('admin_dashboard')  # Optional: prevent superuser access
+
+    agent = get_object_or_404(Agent, user=request.user)
+    return render(request, 'agent_account.html', {'agent': agent})
