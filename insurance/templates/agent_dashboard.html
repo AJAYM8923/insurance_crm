@@ -221,6 +221,8 @@
 
             <label>Date of Birth:</label>
             <input type="date" name="dob" value="{{ agent.dob|date:'Y-m-d' }}" required>
+            <div class="error" id="dobError"></div>
+
 
             <label>Current Profile Picture:</label>
             {% if agent.profile_picture %}
@@ -272,6 +274,8 @@
     const phoneInput = document.querySelector('input[name="phone"]');
     const emailInput = document.querySelector('input[name="email"]');
     const msg = document.getElementById("msg");
+    const dobInput = document.querySelector('input[name="dob"]');
+    const dobError = document.getElementById("dobError");
 
     const phoneError = document.createElement("div");
     const emailError = document.createElement("div");
@@ -295,7 +299,17 @@
         this.value = this.value.replace(/\D/g, "").slice(0, 10);
         phoneError.innerText = validatePhone(this.value) ? "" : "Phone must be exactly 10 digits.";
     });
+    dobInput.addEventListener("input", function () {
+    const selectedDate = new Date(this.value);
+    const today = new Date();
+    today.setHours(0, 0, 0, 0); // remove time for accurate comparison
 
+    if (selectedDate > today) {
+        dobError.innerText = "Date of Birth cannot be in the future.";
+    } else {
+        dobError.innerText = "";
+    }
+});
     emailInput.addEventListener("input", function () {
         emailError.innerText = validateEmail(this.value.trim()) ? "" : "Invalid email format (.com or .in only)";
     });
@@ -307,11 +321,18 @@
 
         const phone = phoneInput.value.trim();
         const email = emailInput.value.trim();
+        const dob = new Date(dobInput.value);
+        const today = new Date();
+        today.setHours(0, 0, 0, 0);
         let hasError = false;
 
         if (!validatePhone(phone)) {
             phoneError.innerText = "Phone must be exactly 10 digits.";
             hasError = true;
+        }
+        if (dob > today) {
+            dobError.innerText = "Date of Birth cannot be in the future.";
+         hasError = true;
         }
 
         if (!validateEmail(email)) {

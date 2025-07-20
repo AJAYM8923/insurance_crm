@@ -68,6 +68,7 @@
             padding: 30px;
             border-radius: 8px;
             box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
+            transition: margin-top 0.3s ease;
         }
 
         h2 {
@@ -156,6 +157,11 @@
                 padding: 25px 20px;
                 width: calc(100% - 40px);
             }
+
+            body.menu-open .container {
+                margin-top: 280px;
+                /* adjust based on your menu height */
+            }
         }
     </style>
 </head>
@@ -187,7 +193,6 @@
             {% endfor %}
             <button type="submit">Submit</button>
         </form>
-
     </div>
 
     <!-- Footer -->
@@ -199,12 +204,8 @@
     <script>
         function toggleMenu() {
             const navLinks = document.getElementById("navLinks");
-            const container = document.getElementById("mainContent");
             navLinks.classList.toggle("show");
-
-            if (window.innerWidth <= 768) {
-                container.style.marginTop = navLinks.classList.contains("show") ? "220px" : "160px";
-            }
+            document.body.classList.toggle("menu-open");
         }
 
         const form = document.getElementById("clientForm");

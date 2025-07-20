@@ -38,6 +38,11 @@
             justify-content: space-between;
             align-items: center;
             flex-wrap: wrap;
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            z-index: 100;
         }
 
         .brand {
@@ -69,7 +74,7 @@
         }
 
         .main-content {
-            padding: 30px 20px;
+            padding: 100px 20px 30px;
         }
 
         .container {
@@ -194,12 +199,6 @@
         }
 
         @media (max-width: 768px) {
-            .navbar {
-                flex-direction: column;
-                align-items: flex-start;
-                position: relative;
-            }
-
             .menu-toggle {
                 display: block;
                 align-self: flex-end;
@@ -210,22 +209,25 @@
                 flex-direction: column;
                 width: 100%;
                 background-color: #002244;
+                position: absolute;
+                top: 60px;
+                left: 0;
+                padding: 10px 20px;
+            }
+
+            .nav-links a {
                 padding: 10px 0;
+                color: #66ccff;
+                font-size: 16px;
+                width: 100%;
             }
 
             .nav-links.show {
                 display: flex;
             }
 
-            .nav-links a {
-                padding: 10px 20px;
-                color: #66ccff;
-                font-size: 16px;
-                width: 100%;
-            }
-
-            .main-content {
-                padding-top: 20px;
+            body.menu-open .main-content {
+                padding-top: 220px;
             }
         }
     </style>
@@ -272,34 +274,34 @@
                             <td>{{ client.campaign.name }}</td>
                             <td class="actions">
                                 <a href="#" class="view-more" data-client='{
-                  "Name": "{{ client.name|escapejs }}",
-                  "Phone": "{{ client.phone|escapejs }}",
-                  "Email": "{{ client.email|escapejs }}",
-                  "Address": "{{ client.address|escapejs }}",
-                  "Age": "{{ client.age }}",
-                  "DOB": "{{ client.dob }}",
-                  "Qualification": "{{ client.qualification|escapejs }}",
-                  "Profession": "{{ client.profession|escapejs }}",
-                  "Aadhar": "{{ client.aadhar }}",
-                  "PAN": "{{ client.pan }}",
-                  "Income": "{{ client.income }}",
-                  "Marital Status": "{{ client.marital_status }}",
-                  "Have Kids": "{{ client.have_kids }}",
-                  "How Know About Us": "{{ client.know_about_us|escapejs }}",
-                  "Existing Profile": "{{ client.existing_profile }}",
-                  "Customer Service": "{{ client.customer_service }}",
-                  "Claim Satisfaction": "{{ client.claim_satisfaction }}",
-                  "Visited Policy": "{{ client.visited_policy }}",
-                  "Willing to Purchase": "{{ client.willingness_to_purchase }}",
-                  "Willing to Share Prev": "{{ client.willingness_to_share_prev }}",
-                  "Prev Insurance Number": "{{ client.prev_insurance_number }}",
-                  "Prev Insurance Name": "{{ client.prev_insurance_name|escapejs }}",
-                  "Prev Insurance Claimed": "{{ client.prev_insurance_claimed }}",
-                  "Willingness to Switch": "{{ client.willingness_to_switch }}",
-                  "Preferences": "{{ client.preferences|escapejs }}",
-                  "Agent Note": "{{ client.agent_note|escapejs }}",
-                  "Campaign": "{{ client.campaign.name|escapejs }}"
-                }'>More</a>
+                                  "Name": "{{ client.name|escapejs }}",
+                                  "Phone": "{{ client.phone|escapejs }}",
+                                  "Email": "{{ client.email|escapejs }}",
+                                  "Address": "{{ client.address|escapejs }}",
+                                  "Age": "{{ client.age }}",
+                                  "DOB": "{{ client.dob }}",
+                                  "Qualification": "{{ client.qualification|escapejs }}",
+                                  "Profession": "{{ client.profession|escapejs }}",
+                                  "Aadhar": "{{ client.aadhar }}",
+                                  "PAN": "{{ client.pan }}",
+                                  "Income": "{{ client.income }}",
+                                  "Marital Status": "{{ client.marital_status }}",
+                                  "Have Kids": "{{ client.have_kids }}",
+                                  "How Know About Us": "{{ client.know_about_us|escapejs }}",
+                                  "Existing Profile": "{{ client.existing_profile }}",
+                                  "Customer Service": "{{ client.customer_service }}",
+                                  "Claim Satisfaction": "{{ client.claim_satisfaction }}",
+                                  "Visited Policy": "{{ client.visited_policy }}",
+                                  "Willing to Purchase": "{{ client.willingness_to_purchase }}",
+                                  "Willing to Share Prev": "{{ client.willingness_to_share_prev }}",
+                                  "Prev Insurance Number": "{{ client.prev_insurance_number }}",
+                                  "Prev Insurance Name": "{{ client.prev_insurance_name|escapejs }}",
+                                  "Prev Insurance Claimed": "{{ client.prev_insurance_claimed }}",
+                                  "Willingness to Switch": "{{ client.willingness_to_switch }}",
+                                  "Preferences": "{{ client.preferences|escapejs }}",
+                                  "Agent Note": "{{ client.agent_note|escapejs }}",
+                                  "Campaign": "{{ client.campaign.name|escapejs }}"
+                                }'>More</a>
                                 <a href="{% url 'edit_client' client.id %}">Edit</a>
                                 <a href="{% url 'delete_client' client.id %}">Delete</a>
                             </td>
@@ -334,6 +336,7 @@
         function toggleMenu() {
             const navLinks = document.getElementById("navLinks");
             navLinks.classList.toggle("show");
+            document.body.classList.toggle("menu-open");
         }
 
         function closeModal() {

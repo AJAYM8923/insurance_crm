@@ -240,10 +240,11 @@
         <!-- Main Content -->
         <div class="main-content">
             <h2>Manage Campaigns</h2>
-
             {% for message in messages %}
             <p class="{{ message.tags }}-msg">{{ message }}</p>
             {% endfor %}
+
+
 
             <div class="form-container">
                 <form method="POST">

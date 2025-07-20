@@ -228,10 +228,11 @@
       <form method="POST" enctype="multipart/form-data">
         {% csrf_token %}
         <h2>Edit Agent</h2>
-
         {% for message in messages %}
         <div class="{{ message.tags }}-msg">{{ message }}</div>
         {% endfor %}
+
+        
 
         <label>First Name:</label>
         <input type="text" name="first_name" value="{{ agent.user.first_name }}" required>
@@ -256,7 +257,8 @@
         </select>
 
         <label>DOB:</label>
-        <input type="date" name="dob" value="{{ agent.dob|date:'Y-m-d' }}" required>
+<input type="date" name="dob" id="dob" value="{{ agent.dob|date:'Y-m-d' }}" required>
+<div class="error-msg" id="dob_error" style="display: none;">Date of Birth cannot be in the future.</div>
 
         <label>Profile Picture:</label>
         {% if agent.profile_picture %}
@@ -278,66 +280,88 @@
 
   <!-- Toggle Script -->
   <script>
-    function toggleMenu() {
-      const sidebar = document.querySelector('.sidebar');
-      sidebar.classList.toggle('active');
-    }
+  function toggleMenu() {
+    const sidebar = document.querySelector('.sidebar');
+    sidebar.classList.toggle('active');
+  }
 
-    // Validation
-    document.addEventListener('DOMContentLoaded', () => {
-      const form = document.querySelector('form');
-      const emailInput = document.querySelector('input[name="email"]');
-      const phoneInput = document.querySelector('input[name="phone"]');
+  document.addEventListener('DOMContentLoaded', () => {
+    const form = document.querySelector('form');
+    const emailInput = document.querySelector('input[name="email"]');
+    const phoneInput = document.querySelector('input[name="phone"]');
+    const dobInput = document.querySelector('input[name="dob"]');
+    const dobError = document.getElementById('dob_error');
 
-      const emailError = document.createElement('div');
-      emailError.style.color = 'red';
-      emailInput.parentNode.insertBefore(emailError, emailInput.nextSibling);
+    const emailError = document.createElement('div');
+    emailError.style.color = 'red';
+    emailInput.parentNode.insertBefore(emailError, emailInput.nextSibling);
 
-      const phoneError = document.createElement('div');
-      phoneError.style.color = 'red';
-      phoneInput.parentNode.insertBefore(phoneError, phoneInput.nextSibling);
+    const phoneError = document.createElement('div');
+    phoneError.style.color = 'red';
+    phoneInput.parentNode.insertBefore(phoneError, phoneInput.nextSibling);
 
-      const isValidEmail = (email) => /^[^\s@]+@[^\s@]+\.(com|in)$/.test(email);
-      const isValidPhone = (phone) => /^\d{10}$/.test(phone);
+    const isValidEmail = (email) => /^[^\s@]+@[^\s@]+\.(com|in)$/.test(email);
+    const isValidPhone = (phone) => /^\d{10}$/.test(phone);
 
-      emailInput.addEventListener('input', () => {
-        if (!isValidEmail(emailInput.value.trim())) {
-          emailError.textContent = "Enter a valid email ending with .com or .in";
-          emailInput.style.borderColor = "red";
-        } else {
-          emailError.textContent = "";
-          emailInput.style.borderColor = "green";
-        }
-      });
-
-      phoneInput.addEventListener('input', () => {
-        if (!isValidPhone(phoneInput.value.trim())) {
-          phoneError.textContent = "Enter a valid 10-digit phone number";
-          phoneInput.style.borderColor = "red";
-        } else {
-          phoneError.textContent = "";
-          phoneInput.style.borderColor = "green";
-        }
-      });
-
-      form.addEventListener('submit', function (event) {
-        let valid = true;
-
-        if (!isValidEmail(emailInput.value.trim())) {
-          emailError.textContent = "Enter a valid email ending with .com or .in";
-          emailInput.style.borderColor = "red";
-          valid = false;
-        }
-
-        if (!isValidPhone(phoneInput.value.trim())) {
-          phoneError.textContent = "Enter a valid 10-digit phone number";
-          phoneInput.style.borderColor = "red";
-          valid = false;
-        }
-
-        if (!valid) event.preventDefault();
-      });
+    emailInput.addEventListener('input', () => {
+      if (!isValidEmail(emailInput.value.trim())) {
+        emailError.textContent = "Enter a valid email ending with .com or .in";
+        emailInput.style.borderColor = "red";
+      } else {
+        emailError.textContent = "";
+        emailInput.style.borderColor = "green";
+      }
     });
-  </script>
+
+    phoneInput.addEventListener('input', () => {
+      if (!isValidPhone(phoneInput.value.trim())) {
+        phoneError.textContent = "Enter a valid 10-digit phone number";
+        phoneInput.style.borderColor = "red";
+      } else {
+        phoneError.textContent = "";
+        phoneInput.style.borderColor = "green";
+      }
+    });
+
+    dobInput.addEventListener('input', () => {
+      const selectedDate = new Date(dobInput.value);
+      const today = new Date();
+      if (selectedDate > today) {
+        dobError.style.display = 'block';
+        dobInput.style.borderColor = "red";
+      } else {
+        dobError.style.display = 'none';
+        dobInput.style.borderColor = "green";
+      }
+    });
+
+    form.addEventListener('submit', function (event) {
+      let valid = true;
+
+      if (!isValidEmail(emailInput.value.trim())) {
+        emailError.textContent = "Enter a valid email ending with .com or .in";
+        emailInput.style.borderColor = "red";
+        valid = false;
+      }
+
+      if (!isValidPhone(phoneInput.value.trim())) {
+        phoneError.textContent = "Enter a valid 10-digit phone number";
+        phoneInput.style.borderColor = "red";
+        valid = false;
+      }
+
+      const selectedDob = new Date(dobInput.value);
+      const today = new Date();
+      if (selectedDob > today) {
+        dobError.style.display = 'block';
+        dobInput.style.borderColor = "red";
+        valid = false;
+      }
+
+      if (!valid) event.preventDefault();
+    });
+  });
+</script>
+
 </body>
 </html>

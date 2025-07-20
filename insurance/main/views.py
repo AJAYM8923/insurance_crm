@@ -67,11 +67,18 @@ def add_agents(request):
             messages.error(request, "Phone number already exists.")
             return render(request, 'add_agents.html')
 
-        # Create random credentials
-        username = email.split('@')[0]
+        # ✅ Generate a unique username
+        username_base = email.split('@')[0]
+        username = username_base
+        counter = 1
+        while User.objects.filter(username=username).exists():
+            username = f"{username_base}{counter}"
+            counter += 1
+
+        # ✅ Create random password
         password = get_random_string(length=6, allowed_chars='1234567890')
 
-        # Create user
+        # ✅ Create user
         user = User.objects.create_user(username=username, email=email, password=password)
         user.first_name = first_name
         user.last_name = last_name
@@ -98,10 +105,9 @@ def add_agents(request):
 
         messages.success(request, 'Agent added and credentials sent to their email.')
         return redirect('add_agents')
+
     agents = Agent.objects.all()
-
-    return render(request, 'add_agents.html',{'agents': agents})
-
+    return render(request, 'add_agents.html', {'agents': agents})
 
 def logout_view(request):
     if request.user.is_authenticated:
@@ -146,14 +152,14 @@ def edit_agent(request, agent_id):
             agent.save()
 
             messages.success(request, "Agent details updated successfully.")
-            return redirect('all_agents')
+            return redirect('edit_agent', agent_id=agent.id)
 
     return render(request, 'edit_agent.html', {'agent': agent})
 @user_passes_test(lambda u: u.is_superuser)
 def delete_agent(request, agent_id):
     agent = get_object_or_404(Agent, id=agent_id)
     agent.user.delete()  # This will also delete Agent due to OneToOne
-    messages.success(request, "Agent deleted successfully.")
+    #messages.success(request, "Agent deleted successfully.")
     return redirect('all_agents')
 
 @user_passes_test(lambda u: u.is_superuser)
@@ -192,7 +198,7 @@ def manage_campaigns(request):
 @user_passes_test(lambda u: u.is_superuser)
 def delete_campaign(request, campaign_id):
     Campaign.objects.get(id=campaign_id).delete()
-    messages.success(request, "Campaign deleted.")
+    #messages.success(request, "Campaign deleted.")
     return redirect('all_campaigns')
 
 
@@ -220,7 +226,7 @@ def edit_campaign(request, campaign_id):
             campaign.agent = Agent.objects.get(id=agent_id)
             campaign.save()
 
-            messages.success(request, "Campaign updated successfully.")
+            #messages.success(request, "Campaign updated successfully.")
             return redirect('all_campaigns')
 
     return render(request, 'edit_campaign.html', {

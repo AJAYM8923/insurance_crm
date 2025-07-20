@@ -201,15 +201,17 @@
         </div>
 
         <div class="main-content">
+            {% if messages %}
+            {% for message in messages %}
+            <div class="{% if message.tags %}{{ message.tags }}-msg{% endif %}">
+                {{ message }}
+            </div>
+            {% endfor %}
+            {% endif %}
+
             <form method="POST" enctype="multipart/form-data" onsubmit="return validateForm()">
                 {% csrf_token %}
                 <h2>Add New Agent</h2>
-
-                {% if messages %}
-                {% for message in messages %}
-                <div class="{% if message.tags %}{{ message.tags }}-msg{% endif %}">{{ message }}</div>
-                {% endfor %}
-                {% endif %}
 
                 <div class="form-group">
                     <label>First Name *</label>
@@ -254,7 +256,9 @@
                 <div class="form-group">
                     <label>Date of Birth *</label>
                     <input type="date" name="dob" id="dob" required />
+                    <div class="error" id="dob_error">Date of Birth cannot be in the future</div>
                 </div>
+
 
                 <div class="form-group">
                     <label>Profile Picture</label>
@@ -281,6 +285,7 @@
             const email = document.getElementById("email");
             const phone = document.getElementById("phone");
             const gender = document.getElementById("gender");
+            const dob = document.getElementById("dob");
 
             function showError(id) {
                 document.getElementById(id).style.display = "block";
@@ -314,6 +319,16 @@
             gender.addEventListener("change", () => {
                 gender.value ? hideError("gender_error") : showError("gender_error");
             });
+            dob.addEventListener("input", () => {
+                const selectedDate = new Date(dob.value);
+                const today = new Date();
+
+                if (selectedDate > today) {
+                    showError("dob_error");
+                } else {
+                    hideError("dob_error");
+                }
+            });
 
             document.querySelector("form").addEventListener("submit", function (e) {
                 if (!validateForm()) e.preventDefault();
@@ -346,6 +361,13 @@
                     showError("gender_error");
                     valid = false;
                 }
+                const selectedDob = new Date(dob.value);
+                const today = new Date();
+                if (selectedDob > today) {
+                    showError("dob_error");
+                    valid = false;
+                }
+
 
                 return valid;
             }
